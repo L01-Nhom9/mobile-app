@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassTrack – Showcase Behance Style</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1>ClassTrack</h1>
+                <div class="tagline">Điểm danh thông minh – Học tập hiệu quả.</div>
+                <p>ClassTrack là một ứng dụng di động giúp giảng viên và sinh viên quản lý việc điểm danh nhanh chóng, chính xác và tiện lợi. Ứng dụng hỗ trợ việc theo dõi lịch học, ghi nhận trạng thái điểm danh theo thời gian thực, và giảm thiểu tối đa sai sót khi nhập liệu thủ công.</p>
+                <p><strong>Nhóm 9 – L01 – 2025</strong></p>
+            </div>
+            <div class="hero-mockups">
+                <!-- Thay thế các link dưới đây bằng ảnh thực tế -->
+                <img class="phone" src="https://via.placeholder.com/320x680/00A3E0/ffffff?text=Login+Screen" alt="Login">
+                <img class="phone" src="https://via.placeholder.com/320x680/00A3E0/ffffff?text=Dashboard+GV" alt="Dashboard Giảng viên">
+                <img class="phone" src="https://via.placeholder.com/320x680/00A3E0/ffffff?text=Xin+nghỉ+SV" alt="Xin nghỉ">
+            </div>
+        </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section class="agenda">
+        <div class="container">
+            <h2>AGENDA</h2>
+            <div class="agenda-grid">
+                <div class="agenda-card">
+                    <div class="blob">😔</div>
+                    <h3>Problems</h3>
+                    <p>Why we do?</p>
+                </div>
+                <div class="agenda-card">
+                    <div class="blob">🎯</div>
+                    <h3>Objectives</h3>
+                    <p>What we want to achieve</p>
+                </div>
+                <div class="agenda-card">
+                    <div class="blob">🔍</div>
+                    <h3>Market Research</h3>
+                    <p>Market gaps & opportunities</p>
+                </div>
+                <div class="agenda-card">
+                    <div class="blob">🚀</div>
+                    <h3>MVP Features & Flow</h3>
+                    <p>Product exhibition</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PROBLEMS ==================== -->
+    <section id="problems" style="background: white; position:relative; overflow:hidden;">
+        <div class="container" style="position:relative; z-index:2;">
+            <div style="text-align:center; margin-bottom:100px;">
+                <h2 class="section-title" style="color:var(--primary); position:relative; display:inline-block;">
+                    Những “nỗi đau” vẫn còn tồn tại
+                    <svg style="position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);" width="180" height="20" viewBox="0 0 180 20" fill="none">
+                        <path d="M0 10 Q90 20 180 10" stroke="#00A3E0" stroke-width="6" opacity="0.4"/>
+                    </svg>
+                </h2>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; max-width:1300px; margin:0 auto;">
+                <!-- Left: Big Stats + Sad Face -->
+                <div style="text-align:center;">
+                    <div style="font-size:180px; line-height:1; margin-bottom:32px;">😔</div>
+                    <div style="font-size:96px; font-weight:800; color:var(--primary); line-height:1;">5–10 phút</div>
+                    <p style="font-size:28px; color:#555; margin-top:16px;">mỗi buổi chỉ để… điểm danh tên</p>
+                </div>
+
+                <!-- Right: List of pains -->
+                <div style="font-size:24px; line-height:1.8;">
+                    <div style="margin-bottom:40px; padding:32px; background:#FFEBEB; border-radius:24px; border-left:8px solid var(--accent);">
+                        <strong style="color:var(--accent);">Giảng viên</strong> mất thời gian, mệt mỏi vì phải gọi từng người
+                    </div>
+                    <div style="margin-bottom:40px; padding:32px; background:#FFF4E0; border-radius:24px; border-left:8px solid #FFB800;">
+                        <strong style="color:#FFB800;">Sinh viên</strong> xin nghỉ qua Zalo, email, giấy tay → chậm, thất lạc, không minh bạch
+                    </div>
+                    <div style="margin-bottom:40px; padding:32px; background:#E0F8F0; border-radius:24px; border-left:8px solid #00A3E0;">
+                        <strong style="color:var(--primary);">Cả hai bên</strong> không biết đơn đang ở trạng thái nào, cuối kỳ tổng hợp thủ công → sai sót liên tục
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:120px;">
+                <p style="font-size:32px; font-weight:600; color:#333;">
+                    Kết quả: <span style="color:var(--accent);">Giảng viên kiệt sức – Sinh viên bất mãn – Dữ liệu chuyên cần không đáng tin cậy</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Background blob decor -->
+        <div style="position:absolute; top:-200px; right:-200px; width:600px; height:600px; background:rgba(255,107,107,0.06); border-radius:50%;"></div>
+        <div style="position:absolute; bottom:-150px; left:-150px; width:500px; height:500px; background:rgba(255,184,0,0.06); border-radius:50%;"></div>
+    </section>
+
+    <!-- ==================== OBJECTIVES ==================== -->
+    <section id="objectives" style="background:var(--secondary); position:relative; overflow:hidden;">
+        <div class="container" style="position:relative; z-index:2;">
+            <div style="text-align:center; margin-bottom:100px;">
+                <h2 class="section-title" style="color:var(--primary); position:relative; display:inline-block;">
+                    Chúng tôi muốn thay đổi điều đó
+                    <svg style="position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);" width="250" height="20" viewBox="0 0 250 20" fill="none">
+                        <path d="M0 10 Q125 0 250 10" stroke="#00A3E0" stroke-width="8" opacity="0.6"/>
+                    </svg>
+                </h2>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:100px; align-items:center; max-width:1400px; margin:0 auto;">
+                <!-- Left: Feature cards -->
+                <div style="display:grid; gap:32px;">
+                    <div style="background:white; padding:40px; border-radius:28px; box-shadow:0 20px 40px rgba(0,163,224,0.1); border-left:6px solid var(--primary);">
+                        <div style="font-size:48px; margin-bottom:16px;">⚡</div>
+                        <h3 style="font-size:28px; font-weight:700; margin-bottom:12px;">Điểm danh chỉ 10 giây</h3>
+                        <p style="font-size:20px; color:#555;">QR code hoặc mã lớp – cả lớp check-in cùng lúc</p>
+                    </div>
+
+                    <div style="background:white; padding:40px; border-radius:28px; box-shadow:0 20px 40px rgba(0,163,224,0.1); border-left:6px solid var(--primary);">
+                        <div style="font-size:48px; margin-bottom:16px;">📄</div>
+                        <h3 style="font-size:28px; font-weight:700; margin-bottom:12px;">Xin nghỉ minh bạch 100%</h3>
+                        <p style="font-size:20px; color:#555;">Đính kèm ảnh/file, theo dõi trạng thái realtime</p>
+                    </div>
+
+                    <div style="background:white; padding:40px; border-radius:28px; box-shadow:0 20px 40px rgba(0,163,224,0.1); border-left:6px solid var(--primary);">
+                        <div style="font-size:48px; margin-bottom:16px;">📊</div>
+                        <h3 style="font-size:28px; font-weight:700; margin-bottom:12px;">Báo cáo tự động – 0 sai sót</h3>
+                        <p style="font-size:20px; color:#555;">Xuất CSV chuyên cần chỉ 1 click cuối kỳ</p>
+                    </div>
+                </div>
+
+                <!-- Right: Big happy result + emoji -->
+                <div style="text-align:center;">
+                    <div style="font-size:200px; line-height:1; margin-bottom:40px;">🎯</div>
+                    <div style="background:white; padding:60px 40px; border-radius:40px; box-shadow:0 30px 80px rgba(0,0,0,0.1); display:inline-block;">
+                        <div style="font-size:96px; font-weight:800; color:var(--primary);">90%</div>
+                        <p style="font-size:32px; font-weight:600; margin-top:16px; color:#333;">
+                            Thời gian điểm danh & xin nghỉ<br>được tiết kiệm
+                        </p>
+                    </div>
+                    <p style="font-size:80px; margin-top:60px;">😊😊😊</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decor blobs -->
+        <div style="position:absolute; top:-100px; left:-100px; width:500px; height:500px; background:rgba(0,163,224,0.08); border-radius:50%;"></div>
+        <div style="position:absolute; bottom:-200px; right:-200px; width:700px; height:700px; background:rgba(0,163,224,0.06); border-radius:50%;"></div>
+    </section>
+
+
+
+
+    <!-- MARKET RESEARCH -->
+    <section id="market">
+        <div class="container">
+            <h2 class="section-title">MARKET RESEARCH & GAPS</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Mô tả</th>
+                            <th>Đối tượng</th>
+                            <th>Tùy chỉnh</th>
+                            <th>Ưu điểm</th>
+                            <th>Quản lý xin nghỉ</th>
+                            <th>Weaknesses / Market Gaps</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Classter</td>
+                            <td>Giải pháp quản lý trường học toàn diện</td>
+                            <td>Trường học, GV, SV</td>
+                            <td>Trung bình</td>
+                            <td>Bao quát nhiều nghiệp vụ</td>
+                            <td>Không có quy trình xin nghỉ chi tiết</td>
+                            <td>Phức tạp, không mobile-first</td>
+                        </tr>
+                        <tr>
+                            <td>Fedena</td>
+                            <td>ERP + LMS</td>
+                            <td>Trường học</td>
+                            <td>Trung bình</td>
+                            <td>Tập trung dữ liệu</td>
+                            <td>Nhập thủ công</td>
+                            <td>Không hỗ trợ minh chứng, phê duyệt tự động</td>
+                        </tr>
+                        <tr>
+                            <td>Moodle</td>
+                            <td>LMS mã nguồn mở</td>
+                            <td>GV, SV</td>
+                            <td>Cao</td>
+                            <td>Linh hoạt</td>
+                            <td>Plugin phức tạp</td>
+                            <td>Cần tùy chỉnh sâu, không mặc định</td>
+                        </tr>
+                        <tr>
+                            <td>Canvas LMS</td>
+                            <td>LMS mạnh</td>
+                            <td>Đại học</td>
+                            <td>Trung bình</td>
+                            <td>Giao diện tốt</td>
+                            <td>Không có module xin nghỉ</td>
+                            <td>Tập trung bài học, không quản lý nghỉ</td>
+                        </tr>
+                        <tr>
+                            <td>Microsoft Teams</td>
+                            <td>Học trực tuyến</td>
+                            <td>GV, SV</td>
+                            <td>Thấp</td>
+                            <td>Tích hợp Office 365</td>
+                            <td>Không có</td>
+                            <td>Không tối ưu điểm danh/nghỉ</td>
+                        </tr>
+                        <tr style="background:#E0F8F0; font-weight:600;">
+                            <td><strong>ClassTrack (của nhóm)</strong></td>
+                            <td>Ứng dụng di động chuyên xin nghỉ & điểm danh</td>
+                            <td>Giảng viên & Sinh viên VN</td>
+                            <td>Cao</td>
+                            <td>Giải quyết trực tiếp pain point thực tế</td>
+                            <td>Chức năng chính, đầy đủ minh chứng + phê duyệt + báo cáo</td>
+                            <td>Chưa nhiều người biết → cần marketing mạnh</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+        <!-- ==================== MARKET RESEARCH ==================== -->
+    <section id="market" style="background: linear-gradient(135deg, #F8FDFF 0%, #E3F8FF 100%); position:relative; overflow:hidden; padding:180px 0;">
+        <div class="container" style="position:relative; z-index:2;">
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:50px; max-width:1600px; margin:0 auto; align-items:start;">
+
+                <div style="opacity:0.75; filter:blur(0.5px); transition:all 0.6s ease;">
+                    <div style="background:rgba(255,255,255,0.8); padding:32px; border-radius:28px; box-shadow:0 15px 40px rgba(0,0,0,0.08);">
+                        <div style="font-size:48px; opacity:0.6;">🏫</div>
+                        <h3 style="font-size:22px; font-weight:700; color:#666;">Classter / Fedena / Moodle / Canvas / Teams</h3>
+                        <p style="font-size:16px; color:#888; line-height:1.7; margin-top:16px;">
+                            • Quá phức tạp hoặc quá chung chung<br>
+                            • Không mobile-first<br>
+                            • Không có quy trình xin nghỉ minh bạch<br>
+                            • Không tập trung vào đại học Việt Nam
+                        </p>
+                        <div style="margin-top:24px; padding:16px; background:#FFE0E0; border-radius:16px; color:var(--accent); font-weight:600; font-size:15px;">
+                            Gap: Không giải quyết được pain point thực tế
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <div style="font-size:120px; font-weight:900; background:linear-gradient(45deg, #FF6B6B, var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:pulse 2s infinite;">
+                        VS
+                    </div>
+                </div>
+
+                <div style="position:relative;">
+                    <!-- Glow background -->
+                    <div style="position:absolute; inset:-20px; background:radial-gradient(circle, var(--primary) 0%, transparent 70%); border-radius:40px; opacity:0.3; animation:glow 4s ease-in-out infinite;"></div>
+
+                    <!-- Main card -->
+                    <div style="background:white; padding:60px 48px; border-radius:40px; box-shadow:0 40px 100px rgba(0,163,224,0.25); border:3px solid var(--primary); position:relative; z-index:2; transform:translateY(-30px); transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1); animation:float 6s ease-in-out infinite;">
+                        <!-- Badge "Winner" -->
+                        <div style="position:absolute; top:-20px; right:40px; background:var(--primary); color:white; padding:12px 28px; border-radius:50px; font-weight:800; font-size:18px; box-shadow:0 10px 30px rgba(0,163,224,0.4);">
+                            WINNER 🚀
+                        </div>
+
+                        <div style="font-size:90px; margin-bottom:20px; background:linear-gradient(45deg, var(--primary), #00E7FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+                            🎯
+                        </div>
+                        <h3 style="font-size:42px; font-weight:800; background:linear-gradient(45deg, var(--primary), #007BFF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:20px; line-height:1.2;">
+                            ClassTrack
+                        </h3>
+
+                        <p style="font-size:22px; color:#333; line-height:1.8; margin:32px 0;">
+                            Ứng dụng di động <strong>mobile-first</strong> được thiết kế riêng cho giảng viên & sinh viên Việt Nam
+                        </p>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:40px;">
+                            <div style="background:#E0F8F0; padding:20px; border-radius:20px; text-align:center; border:2px solid var(--primary);">
+                                <div style="font-size:36px; font-weight:800; color:var(--primary);">10s</div>
+                                <p style="font-size:16px; color:#006D5B; font-weight:600;">Điểm danh 1 lớp</p>
+                            </div>
+                            <div style="background:#E0F8F0; padding:20px; border-radius:20px; text-align:center; border:2px solid var(--primary);">
+                                <div style="font-size:36px; font-weight:800; color:var(--primary);">100%</div>
+                                <p style="font-size:16px; color:#006D5B; font-weight:600;">Minh bạch xin nghỉ</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:32px; padding:24px; background:linear-gradient(135deg, var(--primary), #00D4FF); border-radius:24px; color:white; font-weight:700; font-size:20px; text-align:center;">
+                            Giải quyết trực tiếp mọi pain point<br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:140px; max-width:900px; margin-left:auto; margin-right:auto;">
+                <p style="font-size:28px; color:#333; line-height:1.8; background:rgba(255,255,255,0.9); padding:40px; border-radius:32px; box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <strong style="color:var(--primary);">Insight:</strong> Thị trường đang thiếu một giải pháp đơn giản, minh bạch và dành riêng cho Việt Nam.<br>
+                    <span style="font-size:42px; display:block; margin-top:20px; color:var(--primary); font-weight:800;">
+                        ClassTrack chính là câu trả lời.
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Animation keyframes -->
+        <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(-30px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes glow {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.1); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        </style>
+    </section>
+
+    <!-- ==================== MVP FEATURES & FLOW ==================== -->
+    <section id="mvp" style="padding:200px 0 280px; background:#fff; position:relative; overflow:hidden;">
+        <div class="container" style="position:relative; z-index:2;">
+
+            <!-- Big Title -->
+            <div style="text-align:center; margin-bottom:160px;">
+                <h2 style="font-family:'Playfair Display',serif; font-size:96px; font-weight:800; background:linear-gradient(135deg, var(--primary), #00E0FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">
+                    MVP Features & Flow
+                </h2>
+                <p style="font-size:28px; color:#555; margin-top:24px; max-width:800px; margin-left:auto; margin-right:auto;">
+                    6 bước đơn giản – thay đổi hoàn toàn cách giảng viên và sinh viên tương tác với chuyên cần
+                </p>
+            </div>
+
+            <!-- Horizontal Scroll Container -->
+            <div class="mvp-scroll-container">
+                <div class="mvp-track">
+
+                    <!-- Card 01 -->
+                    <div class="mvp-item">
+                        <div class="mvp-label">01</div>
+                        <div class="mvp-image">
+                            <img src="https://via.placeholder.com/600x1300/00A3E0/ffffff?text=Tạo+lớp+%26+QR" alt="Tạo lớp">
+                        </div>
+                        <h3>Tạo lớp & phát QR</h3>
+                        <p>Giảng viên tạo lớp chỉ trong 15 giây</p>
+                    </div>
+
+                    <!-- Card 02 -->
+                    <div class="mvp-item">
+                        <div class="mvp-label">02</div>
+                        <div class="mvp-image">
+                            <img src="https://via.placeholder.com/600x1300/00A3E0/ffffff?text=Tham+gia+lớp" alt="Tham gia lớp">
+                        </div>
+                        <h3>Sinh viên tham gia lớp</h3>
+                        <p>Quét QR hoặc nhập mã → vào lớp ngay</p>
+                    </div>
+
+                    <!-- Card 03 -->
+                    <div class="mvp-item">
+                        <div class="mvp-label">03</div>
+                        <div class="mvp-image">
+                            <img src="https://via.placeholder.com/600x1300/00A3E0/ffffff?text=Điểm+danh" alt="Điểm danh">
+                        </div>
+                        <h3>Điểm danh 10 giây</h3>
+                        <p>Cả lớp check-in cùng lúc bằng QR</p>
+                    </div>
+
+                    <!-- Card 04 -->
+                    <div class="mvp-item">
+                        <div class="mvp-label">04</div>
+                        <div class="mvp-image">
+                            <img src="https://via.placeholder.com/600x1300/00A3E0/ffffff?text=Xin+nghỉ" alt="Xin nghỉ">
+                        </div>
+                        <h3>Xin nghỉ có minh chứng</h3>
+                        <p>Đính kèm ảnh, file → gửi tức thì</p>
+                    </div>
+
+                    <!-- Card 05 -->
+                    <div class="mvp-item">
+                        <div class="mvp-label">05</div>
+                        <div class="mvp-image">
+                            <img src="https://via.placeholder.com/600x1300/00A3E0/ffffff?text=Duyệt+đơn" alt="Duyệt đơn">
+                        </div>
+                        <h3>Duyệt realtime</h3>
+                        <p>Thông báo đẩy → duyệt/chặn trong 5s</p>
+                    </div>
+
+                    <!-- Card 06 – BIG FINALE -->
+                    <div class="mvp-item finale">
+                        <div class="mvp-label finale">06</div>
+                        <div class="mvp-image finale">
+                            <img src="https://via.placeholder.com/700x1400/00A3E0/ffffff?text=Export+CSV" alt="Export CSV">
+                        </div>
+                        <div class="finale-content">
+                            <h3>Xuất báo cáo chuyên cần</h3>
+                            <p class="highlight">1 click → CSV chính xác 100%</p>
+                            <div class="finale-cta">
+                                Không còn thủ công<br>
+                            <span style="font-size:32px;">→ Không còn sai sót!</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Final Tagline -->
+            <div style="text-align:center; margin-top:180px;">
+                <p style="font-size:42px; font-weight:700; color:#1a1a1a; line-height:1.4;">
+                    ClassTrack – <span style="color:var(--primary);">Đơn giản hóa mọi thứ,</span><br>
+                    để giảng dạy và học tập trở nên <span style="background:linear-gradient(135deg,var(--primary),#00E0FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">tốt đẹp hơn.</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Background decoration -->
+        <div style="position:absolute; top:10%; right:-200px; width:800px; height:800px; background:rgba(0,163,224,0.05); border-radius:50%; filter:blur(80px);"></div>
+        <div style="position:absolute; bottom:-200px; left:-200px; width:700px; height:700px; background:rgba(0,163,224,0.04); border-radius:50%; filter:blur(80px);"></div>
+    </section>
+
+
+
+    <footer>
+        <div class="container">
+            ClassTrack © 2025 – Nhóm 9 L01<br>
+        </div>
+    </footer>
+
+</body>
+</html>
