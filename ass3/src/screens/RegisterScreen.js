@@ -3,22 +3,32 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import { LinearGradient } from 'expo-linear-gradient';
 import mockApi from '../services/mockApi';
 
-export default function LoginScreen({ navigation, onLogin }) {
-  const [username, setUsername] = useState('student');
-  const [password, setPassword] = useState('123');
+export default function RegisterScreen({ navigation }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState('');
 
-  const handleLogin = async () => {
-    try {
-      const response = await mockApi.auth.login({ username, password });
-      onLogin(response.data);
-    } catch (error) {
-      console.log('Login error:', error);
-      Alert.alert('Error', 'Invalid credentials');
+  const handleRegister = async () => {
+    if (!username || !password || !email) {
+       Alert.alert('Error', 'Please fill all fields');
+       return;
     }
-  };
+    if (password !== confirmPassword) {
+        Alert.alert('Error', 'Passwords do not match');
+        return;
+    }
 
-  const handleRegister = () => {
-    navigation.navigate('Register');
+    try {
+      // In a real app, this would call an API
+      // await mockApi.auth.register({ username, password, email });
+      Alert.alert('Success', 'Registration successful!', [
+          { text: 'OK', onPress: () => navigation.navigate('Login') }
+      ]);
+    } catch (error) {
+      console.log('Register error:', error);
+      Alert.alert('Error', 'Registration failed');
+    }
   };
 
   return (
@@ -30,40 +40,56 @@ export default function LoginScreen({ navigation, onLogin }) {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.card}>
-          <Text style={styles.title}>WELLCOME TO CLASSTRACK</Text>
+          <Text style={styles.title}>REGISTER</Text>
           
-          <TextInput
+           <TextInput
             style={styles.input}
-            placeholder="Tên đăng nhập"
+            placeholder="Username"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
             placeholderTextColor="#999"
           />
+           <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+             keyboardType="email-address"
+            placeholderTextColor="#999"
+          />
           <TextInput
             style={styles.input}
-            placeholder="Mật khẩu"
+            placeholder="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
             placeholderTextColor="#999"
           />
+           <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            placeholderTextColor="#999"
+          />
 
-          <TouchableOpacity onPress={handleLogin} style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleRegister} style={styles.buttonContainer}>
             <LinearGradient
               colors={['#A78BFA', '#F9A8D4']}
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }} // Left to right
+              end={{ x: 1, y: 0 }} 
               style={styles.button}
             >
-              <Text style={styles.buttonText}>Đăng nhập</Text>
+              <Text style={styles.buttonText}>Đăng ký</Text>
             </LinearGradient>
           </TouchableOpacity>
 
-           <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
-              <Text style={styles.registerText}>Chưa có tài khoản? Đăng ký ngay</Text>
+           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.loginLinkButton}>
+              <Text style={styles.loginLinkText}>Đã có tài khoản? Đăng nhập</Text>
            </TouchableOpacity>
-
         </View>
       </ScrollView>
     </LinearGradient>
@@ -81,11 +107,11 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: 'white',
-    borderRadius: 30, // More rounded as per visual cue (implied premium look)
+    borderRadius: 30, 
     padding: 30,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 }, // Slightly deeper shadow
+    shadowOffset: { width: 0, height: 4 }, 
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 8,
@@ -93,18 +119,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#202244', // Specified color
-    marginBottom: 40,
+    color: '#202244',
+    marginBottom: 30,
     textAlign: 'center',
-    fontFamily: 'Roboto', // Requested font
+    fontFamily: 'Roboto',
     width: '100%',
   },
   input: {
     width: '100%',
-    height: 55, // Slightly taller
+    height: 55, 
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 15, // More rounded
+    borderRadius: 15, 
     paddingHorizontal: 20,
     marginBottom: 20,
     backgroundColor: '#fff',
@@ -113,10 +139,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
   },
   buttonContainer: {
-    width: '60%', // Adjust width to match design often seen
+    width: '60%', 
     marginTop: 10,
     borderRadius: 25,
-    overflow: 'hidden', // Ensure gradient respects border radius
+    overflow: 'hidden', 
   },
   button: {
     paddingVertical: 15,
@@ -129,10 +155,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Roboto',
   },
-  registerButton: {
+   loginLinkButton: {
       marginTop: 20,
   },
-  registerText: {
+  loginLinkText: {
       color: '#202244',
       fontSize: 14,
       textDecorationLine: 'underline',

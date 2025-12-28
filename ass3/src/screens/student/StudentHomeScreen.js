@@ -1,61 +1,111 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import mockApi from '../../services/mockApi'; // Adjusted path
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons, Feather } from '@expo/vector-icons';
 
-// ... imports
-// Note: I need to update the import list in the real file if I use icons, but I'll use Text for now to be safe or simple styles.
+// Mock data to match the UI screenshot
+const MOCK_CLASSES = [
+  { _id: '1', name: 'Quản lý dự án', code: 'CO3007', instructor: 'TRẦN VĂN HOÀI', color: '#93C5FD' },
+  { _id: '2', name: 'Đánh giá Hiệu năng Hệ thống', code: 'CO3007', instructor: 'BÙI XUÂN GIANG', color: '#C084FC' },
+  { _id: '3', name: 'Phát triển ứng dụng thiết bị di động', code: 'CO3007', instructor: 'HOÀNG LÊ HẢI THANH', color: '#FCD34D' },
+];
 
-export default function StudentHomeScreen({ navigation, user, onLogout }) {
-  const [classes, setClasses] = useState([]);
-  const [loading, setLoading] = useState(true);
+const ITEMS_PER_PAGE = 5;
 
-  const fetchClasses = async () => {
-    try {
-      const response = await mockApi.classrooms.list(user._id, user.role);
-      setClasses(response.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchClasses();
-  }, []);
+export default function StudentHomeScreen({ navigation, onLogout }) {
+  const [searchText, setSearchText] = useState('');
+  
+  // Filter classes based on search text
+  const filteredClasses = MOCK_CLASSES.filter(item => {
+      const searchLower = searchText.toLowerCase();
+      return (
+          item.name.toLowerCase().includes(searchLower) ||
+          item.code.toLowerCase().includes(searchLower) ||
+          item.instructor.toLowerCase().includes(searchLower)
+      );
+  });
 
   const renderItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.card}
       onPress={() => navigation.navigate('RequestForm', { classroom: item })}
     >
-      <View style={styles.header}>
-        <Text style={styles.code}>{item.code}</Text>
+      <View style={styles.cardContent}>
+        <View style={styles.cardInfo}>
+             <Text style={styles.className}>{item.name}</Text>
+             <Text style={styles.classDetails}>({item.code})_{item.instructor}</Text>
+             <View style={[styles.progressBar, { backgroundColor: item.color }]} />
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#93C5FD" />
       </View>
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.instructor}>GV: {item.instructor?.fullName}</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.screenHeader}>
-         <Text style={styles.title}>My Classroom</Text>
-         <TouchableOpacity onPress={onLogout} style={styles.logoutBtn}>
-            <Text style={styles.logoutText}>Logout</Text>
-         </TouchableOpacity>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onLogout}>
+             <Ionicons name="log-out-outline" size={24} color="#202244" />
+        </TouchableOpacity>
       </View>
-      
-      {loading ? (
-        <ActivityIndicator size="large" color="#E6A8D7" />
-      ) : (
-        <FlatList
-          data={classes}
-          renderItem={renderItem}
-          keyExtractor={item => item._id}
-          contentContainerStyle={styles.list}
-          ListEmptyComponent={<Text style={styles.empty}>Chưa có lớp học nào.</Text>}
+
+      <View style={styles.titleRow}>
+          <Text style={styles.screenTitle}>My classroom</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('JoinClass')}>
+            <LinearGradient
+                colors={['#A78BFA', '#F9A8D4']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.joinButton}
+            >
+                <Text style={styles.joinButtonText}>Tham gia lớp</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Feather name="search" size={20} color="#999" style={styles.searchIcon} />
+        <TextInput
+            style={styles.searchInput}
+            placeholder="Search for.."
+            value={searchText}
+            onChangeText={setSearchText}
+            placeholderTextColor="#999"
         />
+      </View>
+
+      {/* List */}
+      <FlatList
+        data={filteredClasses}
+        renderItem={renderItem}
+        keyExtractor={item => item._id}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+            <Text style={styles.emptyText}>No classes found matching "{searchText}"</Text>
+        }
+      />
+
+      {/* Pagination (Conditional) */}
+      {filteredClasses.length > ITEMS_PER_PAGE && (
+        <View style={styles.pagination}>
+            <TouchableOpacity style={styles.pageArrow}>
+                <Ionicons name="chevron-back" size={20} color="#999" />
+            </TouchableOpacity>
+            <Text style={styles.pageNumber}>1</Text>
+            <LinearGradient
+                colors={['#93C5FD', '#F9A8D4']}
+                style={styles.activePage}
+            >
+                <Text style={styles.activePageText}>2</Text>
+            </LinearGradient>
+            <Text style={styles.pageNumber}>3</Text>
+            <TouchableOpacity style={styles.pageArrow}>
+                <Ionicons name="chevron-forward" size={20} color="#999" />
+            </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -64,69 +114,134 @@ export default function StudentHomeScreen({ navigation, user, onLogout }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
-    paddingTop: 50,
-  },
-  screenHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  logoutBtn: {
-    padding: 8,
-    backgroundColor: '#eee',
-    borderRadius: 8,
-  },
-  logoutText: {
-    color: '#333',
-    fontWeight: '600'
-  },
-  list: {
-    paddingBottom: 20,
-  },
-  // ... rest of styles
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#eee',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    backgroundColor: '#fff', 
+    paddingHorizontal: 20,
+    paddingTop: 50, 
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 5,
+    marginBottom: 10,
   },
-  code: {
-    fontSize: 14,
-    color: '#888',
-    fontWeight: '600',
+  titleRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 20,
   },
-  name: {
-    fontSize: 18,
+  screenTitle: {
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
+    color: '#000',
+    fontFamily: 'Roboto',
   },
-  instructor: {
-    fontSize: 14,
-    color: '#666',
+  joinButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 20,
+      borderRadius: 20,
   },
-  empty: {
-    textAlign: 'center',
-    color: '#999',
-    marginTop: 50,
+  joinButtonText: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: 12,
+      fontFamily: 'Roboto',
+  },
+  searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#fff',
+      borderRadius: 15,
+      paddingHorizontal: 15,
+      height: 50,
+      marginBottom: 25,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 5,
+      elevation: 2,
+      borderWidth: 1,
+      borderColor: '#f0f0f0'
+  },
+  searchIcon: {
+      marginRight: 10,
+  },
+  searchInput: {
+      flex: 1,
+      fontSize: 14,
+      fontFamily: 'Roboto',
+      color: '#333',
+  },
+  listContent: {
+      paddingBottom: 20,
+  },
+  card: {
+      backgroundColor: 'white',
+      borderRadius: 20,
+      padding: 20,
+      marginBottom: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 10,
+      elevation: 5,
+  },
+  cardContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+  },
+  cardInfo: {
+      flex: 1,
+      marginRight: 10,
+  },
+  className: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#333',
+      marginBottom: 5,
+      fontFamily: 'Roboto',
+  },
+  classDetails: {
+      fontSize: 12,
+      color: '#555',
+      marginBottom: 10,
+      fontFamily: 'Roboto',
+  },
+  progressBar: {
+      height: 4,
+      width: '80%', 
+      borderRadius: 2,
+  },
+  pagination: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 20,
+  },
+  pageArrow: {
+      padding: 10,
+  },
+  pageNumber: {
+      fontSize: 16,
+      color: '#333',
+      marginHorizontal: 15,
+      fontFamily: 'Roboto',
+  },
+  activePage: {
+      width: 30,
+      height: 30,
+      borderRadius: 5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginHorizontal: 10,
+  },
+  activePageText: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontFamily: 'Roboto',
+  },
+  emptyText: {
+      textAlign: 'center',
+      color: '#999',
+      marginTop: 20,
+      fontFamily: 'Roboto',
   }
 });
