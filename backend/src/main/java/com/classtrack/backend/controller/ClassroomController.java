@@ -3,6 +3,7 @@ package com.classtrack.backend.controller;
 import com.classtrack.backend.dto.CreateClassRequest;
 import com.classtrack.backend.dto.JoinRequest;
 import com.classtrack.backend.dto.CreateClassResponse;
+import com.classtrack.backend.dto.StudentInfo;
 import com.classtrack.backend.service.JwtService;
 import com.classtrack.backend.entity.User;
 import com.classtrack.backend.repository.UserRepository;
@@ -48,9 +49,13 @@ public class ClassroomController {
 
     @GetMapping("/{classId}/students")
     @PreAuthorize("hasRole('INSTRUCTOR')")
-    public ResponseEntity<?> studentsInClass(@PathVariable String classId, Principal principal) {
+    public ResponseEntity<List<StudentInfo>> studentsInClass(@PathVariable String classId, Principal principal) {
         User instructor = getCurrentUser(principal);
-        return ResponseEntity.ok(service.getStudentsInClass(classId, instructor));
+        List<StudentInfo> students = service.getStudentsInClass(classId, instructor)
+            .stream()
+            .map(enrollment -> StudentInfo.fromEntity(enrollment.getStudent()))
+            .toList();
+        return ResponseEntity.ok(students);
     }
 
     @PostMapping("/join")
