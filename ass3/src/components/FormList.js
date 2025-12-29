@@ -5,9 +5,9 @@ const FormList = ({ data }) => {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'pending': return { color: '#C084FC', borderColor: '#C084FC', bg: '#F3E8FF' }; // Purple
-            case 'approved': return { color: '#4ADE80', borderColor: '#4ADE80', bg: '#DCFCE7' }; // Green
-            case 'rejected': return { color: '#F87171', borderColor: '#F87171', bg: '#FEE2E2' }; // Red
+            case 'pending': return { color: '#C084FC', borderColor: '#C084FC', bg: '#F3E8FF' }; 
+            case 'approved': return { color: '#4ADE80', borderColor: '#4ADE80', bg: '#DCFCE7' };
+            case 'rejected': return { color: '#F87171', borderColor: '#F87171', bg: '#FEE2E2' };
             default: return { color: '#999', borderColor: '#999', bg: '#eee' };
         }
     };

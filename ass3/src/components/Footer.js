@@ -29,16 +29,15 @@ export const getTabScreenOptions = (role = 'student') => ({ route }) => ({
             iconName = focused ? 'home' : 'home-outline';
             return <Ionicons name={iconName} size={size} color={color} />;
         } else if (route.name === 'Add') {
-            // Custom Middle Button Look
             return (
                 <View style={{
                     width: 50,
                     height: 50,
                     borderRadius: 25,
-                    backgroundColor: '#93C5FD', // Fallback
+                    backgroundColor: '#93C5FD',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginTop: -20, // Float effect
+                    marginTop: -20,
                     shadowColor: '#93C5FD',
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.3,

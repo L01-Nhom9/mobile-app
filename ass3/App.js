@@ -14,7 +14,10 @@ import StudentHomeScreen from './src/screens/student/StudentHomeScreen';
 import RequestListScreen from './src/screens/student/RequestListScreen';
 import RequestFormScreen from './src/screens/student/RequestFormScreen';
 import InstructorHomeScreen from './src/screens/instructor/InstructorHomeScreen';
+import CreateClassScreen from './src/screens/instructor/CreateClassScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
+import ClassDetailScreen from './src/screens/instructor/ClassDetailScreen';
+import InstructorRequestListScreen from './src/screens/instructor/InstructorRequestListScreen';
 
 import { getTabScreenOptions } from './src/components/Footer';
 
@@ -45,13 +48,20 @@ function StudentTabs({ user, onLogout }) {
 }
 
 // --- Instructor Stack ---
-function InstructorTabs({ user, onLogout }) {
+function InstructorTabs({ user, onLogout, navigation }) {
   return (
     <Tab.Navigator screenOptions={getTabScreenOptions('instructor')}>
-      <Tab.Screen name="InstructorHome">
+      <Tab.Screen name="InstructorHome" options={{ title: 'HOME' }}>
         {props => <InstructorHomeScreen {...props} user={user} onLogout={onLogout} />}
       </Tab.Screen>
-      {/* Add 'Classes' tab here later */}
+      <Tab.Screen name="Add" component={View} options={{ title: '' }} listeners={{
+        tabPress: (e) => {
+          e.preventDefault();
+          // Optional: Navigate to Create Class if desired, or keep as placeholder
+          // navigation.navigate('CreateClass');
+        },
+      }} />
+      <Tab.Screen name="List" component={InstructorRequestListScreen} options={{ title: 'LIST' }} />
     </Tab.Navigator>
   );
 }
@@ -112,9 +122,13 @@ export default function App() {
           </>
         ) : (
           // Instructor Stack
-          <Stack.Screen name="InstructorMain">
-            {props => <InstructorTabs {...props} user={user} onLogout={handleLogout} />}
-          </Stack.Screen>
+          <>
+            <Stack.Screen name="InstructorMain">
+              {props => <InstructorTabs {...props} user={user} onLogout={handleLogout} />}
+            </Stack.Screen>
+            <Stack.Screen name="CreateClass" component={CreateClassScreen} />
+            <Stack.Screen name="ClassDetail" component={ClassDetailScreen} />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
