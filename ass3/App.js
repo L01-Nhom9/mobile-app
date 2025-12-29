@@ -16,6 +16,8 @@ import RequestFormScreen from './src/screens/student/RequestFormScreen';
 import InstructorHomeScreen from './src/screens/instructor/InstructorHomeScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 
+import { getTabScreenOptions } from './src/components/Footer';
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -25,70 +27,19 @@ import { Ionicons } from '@expo/vector-icons';
 function StudentTabs({ user, onLogout }) {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarStyle: {
-          height: 70,
-          paddingBottom: 10,
-          paddingTop: 10,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 5,
-          elevation: 10,
-        },
-        tabBarActiveTintColor: '#93C5FD',
-        tabBarInactiveTintColor: '#999',
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontFamily: 'Roboto',
-        },
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === 'StudentHome') {
-            iconName = focused ? 'home' : 'home-outline';
-            return <Ionicons name={iconName} size={size} color={color} />;
-          } else if (route.name === 'Add') {
-             // Custom Middle Button Look
-             return (
-                 <View style={{
-                     width: 50,
-                     height: 50,
-                     borderRadius: 25,
-                     backgroundColor: '#93C5FD', // Fallback
-                     justifyContent: 'center',
-                     alignItems: 'center',
-                     marginTop: -20, // Float effect
-                     shadowColor: '#93C5FD',
-                     shadowOffset: { width: 0, height: 4 },
-                     shadowOpacity: 0.3,
-                     shadowRadius: 5,
-                     elevation: 5,
-                 }}>
-                    <Ionicons name="add" size={30} color="white" />
-                 </View>
-             );
-          } else if (route.name === 'List') {
-            iconName = focused ? 'document-text' : 'document-text-outline';
-            return <Ionicons name={iconName} size={size} color={color} />;
-          }
-        },
-      })}
+      screenOptions={getTabScreenOptions('student')}
     >
       <Tab.Screen name="StudentHome" options={{ title: 'HOME' }}>
-          {props => <StudentHomeScreen {...props} user={user} onLogout={onLogout} />}
+        {props => <StudentHomeScreen {...props} user={user} onLogout={onLogout} />}
       </Tab.Screen>
-       <Tab.Screen name="Add" component={View} options={{ title: '' }} listeners={{
-           tabPress: (e) => {
-             e.preventDefault(); // Placeholder action
-           },
-       }}/>
-       <Tab.Screen name="List" options={{ title: 'LIST' }}>
-           {props => <RequestListScreen {...props} user={user} onLogout={onLogout} />}
-       </Tab.Screen> 
+      <Tab.Screen name="Add" component={View} options={{ title: '' }} listeners={{
+        tabPress: (e) => {
+          e.preventDefault(); // Placeholder action
+        },
+      }} />
+      <Tab.Screen name="List" options={{ title: 'LIST' }}>
+        {props => <RequestListScreen {...props} user={user} onLogout={onLogout} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
@@ -96,9 +47,9 @@ function StudentTabs({ user, onLogout }) {
 // --- Instructor Stack ---
 function InstructorTabs({ user, onLogout }) {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator screenOptions={getTabScreenOptions('instructor')}>
       <Tab.Screen name="InstructorHome">
-          {props => <InstructorHomeScreen {...props} user={user} onLogout={onLogout} />}
+        {props => <InstructorHomeScreen {...props} user={user} onLogout={onLogout} />}
       </Tab.Screen>
       {/* Add 'Classes' tab here later */}
     </Tab.Navigator>
@@ -138,10 +89,10 @@ export default function App() {
         {!user ? (
           // Auth Stack
           <>
-             {isFirstLaunch && (
-               <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-             )}
-             <Stack.Screen name="Login">
+            {isFirstLaunch && (
+              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            )}
+            <Stack.Screen name="Login">
               {props => <LoginScreen {...props} onLogin={setUser} />}
             </Stack.Screen>
             <Stack.Screen name="Register" component={RegisterScreen} />
@@ -153,16 +104,16 @@ export default function App() {
               {props => <StudentTabs {...props} user={user} onLogout={handleLogout} />}
             </Stack.Screen>
             <Stack.Group screenOptions={{ presentation: 'transparentModal', animation: 'fade' }}>
-               <Stack.Screen name="RequestForm">
-                  {props => <RequestFormScreen {...props} user={user} />}
-               </Stack.Screen>
-               <Stack.Screen name="JoinClass" component={JoinClassScreen} />
+              <Stack.Screen name="RequestForm">
+                {props => <RequestFormScreen {...props} user={user} />}
+              </Stack.Screen>
+              <Stack.Screen name="JoinClass" component={JoinClassScreen} />
             </Stack.Group>
           </>
         ) : (
           // Instructor Stack
           <Stack.Screen name="InstructorMain">
-              {props => <InstructorTabs {...props} user={user} onLogout={handleLogout} />}
+            {props => <InstructorTabs {...props} user={user} onLogout={handleLogout} />}
           </Stack.Screen>
         )}
       </Stack.Navigator>
