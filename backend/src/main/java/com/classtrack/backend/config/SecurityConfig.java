@@ -10,9 +10,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.classtrack.backend.security.JwtAuthenticationFilter;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -27,6 +29,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/instructor/**").hasRole("INSTRUCTOR")
                 .requestMatchers("/api/student/**").hasRole("STUDENT")
+                .requestMatchers("/api/leave-request/evidence/**").authenticated()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
