@@ -57,13 +57,68 @@ public class LeaveRequestService {
         return repo.findByStudent(student);
     }
 
-    // Để INSTRUCTOR xem (mở rộng sau)
-    public List<LeaveRequest> getPendingRequestsForClass(String classroomId, User instructor) {
+    public List<LeaveRequest> getMyRequestsWithFilter(User student, LocalDate startDate, LocalDate endDate) {
+        return repo.findByStudentWithFilter(student.getId(), startDate, endDate);
+    }
+
+    public List<LeaveRequest> getPendingRequestsForClass(String classroomId, LocalDate startDate, LocalDate endDate, User instructor) {
         Classroom classroom = classroomRepo.findById(classroomId)
                 .orElseThrow(() -> new RuntimeException("Class not found"));
         if (!classroom.getInstructor().equals(instructor)) {
             throw new RuntimeException("Not authorized");
         }
-        return repo.findByClassroomAndStatus(classroom, LeaveRequest.Status.PENDING);
+        // Nếu không có filter tuần, dùng method cũ
+        if (startDate == null || endDate == null) {
+            return repo.findByClassroomAndStatus(classroom, LeaveRequest.Status.PENDING);
+        }
+        return repo.findPendingByClassAndWeek(classroomId, startDate, endDate);
+    }
+
+
+    @Transactional
+    public LeaveRequest approveRequest(Long requestId, User instructor) {
+        LeaveRequest request = repo.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        // Kiểm tra quyền: Phải là instructor của lớp
+        if (!request.getClassroom().getInstructor().equals(instructor)) {
+            throw new RuntimeException("Not authorized to approve this request");
+        }
+
+        if (request.getStatus() != LeaveRequest.Status.PENDING) {
+            throw new RuntimeException("Request already processed");
+        }
+
+        request.setStatus(LeaveRequest.Status.APPROVED);
+        request.setApprovedBy(instructor);
+        request.setApprovedAt(LocalDateTime.now());
+        request.setDenialReason(null); // Xóa nếu có
+
+        return repo.save(request);
+    }
+
+    @Transactional
+    public LeaveRequest denyRequest(Long requestId, String denialReason, User instructor) {
+        LeaveRequest request = repo.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        if (!request.getClassroom().getInstructor().equals(instructor)) {
+            throw new RuntimeException("Not authorized to deny this request");
+        }
+
+        if (request.getStatus() != LeaveRequest.Status.PENDING) {
+            throw new RuntimeException("Request already processed");
+        }
+
+        if (denialReason == null || denialReason.trim().isEmpty()) {
+            throw new RuntimeException("Denial reason is required");
+        }
+
+        request.setStatus(LeaveRequest.Status.REJECTED);
+        request.setApprovedBy(instructor);
+        request.setApprovedAt(LocalDateTime.now());
+        request.setDenialReason(denialReason);
+
+        return repo.save(request);
     }
 }
