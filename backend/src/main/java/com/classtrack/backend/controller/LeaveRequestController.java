@@ -2,6 +2,10 @@ package com.classtrack.backend.leaverequest;
 
 import com.classtrack.backend.entity.LeaveRequest;
 import com.classtrack.backend.dto.LeaveRequestResponse;
+import com.classtrack.backend.dto.DenyRequest;
+import com.classtrack.backend.dto.ApproveResponse;
+import com.classtrack.backend.dto.LeaveRequestInfo;
+import com.classtrack.backend.dto.DenyResponse;
 import com.classtrack.backend.service.LeaveRequestService;
 import com.classtrack.backend.entity.User;
 import com.classtrack.backend.repository.UserRepository;
@@ -60,27 +64,74 @@ public class LeaveRequestController {
 
     @GetMapping("/my-requests")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<List<LeaveRequestResponse>> myRequests(Principal principal) {
+    public ResponseEntity<List<LeaveRequestResponse>> myRequests(
+        @RequestParam(required = false) String startDate, // "2025-12-29"
+        @RequestParam(required = false) String endDate,   // "2026-01-04"
+        Principal principal) {
         User student = userRepo.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        List<LeaveRequestResponse> response = service.getMyRequests(student)
+
+        LocalDate start = (startDate != null) ? LocalDate.parse(startDate) : null;
+        LocalDate end = (endDate != null) ? LocalDate.parse(endDate) : null;
+
+        List<LeaveRequestResponse> response = service.getMyRequestsWithFilter(student, start, end)
                 .stream()
                 .map(LeaveRequestResponse::fromEntity)
                 .toList();
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{requestId}")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<LeaveRequestInfo> getRequestDetail(@PathVariable Long requestId, Principal principal) {
+        User student = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        LeaveRequest request = leaveRequestRepo.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        if (!request.getStudent().equals(student)) {
+            throw new RuntimeException("Not your request");
+        }
+
+        return ResponseEntity.ok(LeaveRequestInfo.fromEntity(request));
+    }
+
     @GetMapping("/{classroomId}/pending")
     @PreAuthorize("hasRole('INSTRUCTOR')")
-    public ResponseEntity<List<LeaveRequestResponse>> pendingRequests(@PathVariable String classroomId, Principal principal) {
+    public ResponseEntity<List<LeaveRequestResponse>> pendingRequests(@PathVariable String classroomId,
+        @RequestParam(required = false) String startDate, // "2025-12-29"
+        @RequestParam(required = false) String endDate,   // "2026-01-04"
+        Principal principal) {
         User instructor = userRepo.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<LeaveRequestResponse> response = service.getPendingRequestsForClass(classroomId, instructor)
+        LocalDate start = (startDate != null) ? LocalDate.parse(startDate) : null;
+        LocalDate end = (endDate != null) ? LocalDate.parse(endDate) : null;
+
+        List<LeaveRequestResponse> response = service.getPendingRequestsForClass(classroomId, start, end, instructor)
                 .stream()
                 .map(LeaveRequestResponse::fromEntity)
                 .toList();
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{requestId}/approve")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<ApproveResponse> approve(@PathVariable Long requestId, Principal principal) {
+        User instructor = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(ApproveResponse.fromEntity(service.approveRequest(requestId, instructor)));
+    }
+
+    @PostMapping("/{requestId}/deny")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<DenyResponse> deny(@PathVariable Long requestId,
+                                             @RequestBody DenyRequest denyReq,
+                                             Principal principal) {
+        User instructor = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(DenyResponse.fromEntity(service.denyRequest(requestId, denyReq.denialReason(), instructor)));
     }
 
     @GetMapping("/evidence/{id}")

@@ -30,6 +30,14 @@ public class LeaveRequest {
 
     private LocalDate absenceDate; //(Format: 2025-12-30)
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approved_by")
+    private User approvedBy;
+
+    private LocalDateTime approvedAt; // Thời gian phê duyệt
+
+    private String denialReason;
+
 
     @Column(nullable = false)
     private String reason;
