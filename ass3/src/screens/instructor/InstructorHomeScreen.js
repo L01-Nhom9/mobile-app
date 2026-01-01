@@ -1,92 +1,75 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import mockApi from '../../services/mockApi';
+
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { Feather, Ionicons } from '@expo/vector-icons';
+import GradientButton from '../../components/Button';
+import ClassList from '../../components/ClassList';
+import CreateClassModal from '../../components/CreateClassModal';
+
+const MOCK_CLASSES = [
+  { _id: '1', name: 'Quản lý dự án', code: 'CO3007', instructor: 'TRẦN VĂN HOÀI', color: '#93C5FD' },
+  { _id: '2', name: 'Đánh giá Hiệu năng Hệ thống', code: 'CO3007', instructor: 'BÙI XUÂN GIANG', color: '#C084FC' },
+  { _id: '3', name: 'Phát triển ứng dụng thiết bị di động', code: 'CO3007', instructor: 'HOÀNG LÊ HẢI THANH', color: '#FCD34D' },
+];
 
 export default function InstructorHomeScreen({ navigation, user, onLogout }) {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState('');
+  const [createModalVisible, setCreateModalVisible] = useState(false);
 
-  const fetchRequests = async () => {
-    try {
-      // Simulate API call
-      setTimeout(() => {
-        setRequests([
-           { _id: 'r1', student: { fullName: 'Nguyen Van A', studentId: '201201' }, classroom: { name: 'Mobile Dev', code: 'CO3007' }, reason: 'Sốt cao', date: '2025-12-28', status: 'pending' },
-           { _id: 'r2', student: { fullName: 'Le Thi C', studentId: '201202' }, classroom: { name: 'Software Project', code: 'CO3008' }, reason: 'Chuyện gia đình', date: '2025-12-29', status: 'pending' }
-        ]);
-        setLoading(false);
-      }, 500);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRequests();
-  }, []);
-
-  const handleApprove = (id) => {
-    Alert.alert("Approved", `Request ${id} approved`);
-    setRequests(prev => prev.filter(r => r._id !== id));
-  };
-
-  const handleReject = (id) => {
-    Alert.alert("Rejected", `Request ${id} rejected`);
-    setRequests(prev => prev.filter(r => r._id !== id));
-  };
-
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.studentName}>{item.student.fullName} - {item.student.studentId}</Text>
-        <TouchableOpacity style={styles.statusBadge}>
-          <Text style={styles.statusText}>{item.status}</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <Text style={styles.classInfo}>{item.classroom.name} ({item.classroom.code})</Text>
-      
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>Ngày:</Text>
-        <Text style={styles.value}>{item.date}</Text>
-      </View>
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>Lý do:</Text>
-        <Text style={styles.value}>{item.reason}</Text>
-      </View>
-
-      <View style={styles.actions}>
-        <TouchableOpacity style={[styles.btn, styles.btnReject]} onPress={() => handleReject(item._id)}>
-          <Text style={styles.btnText}>Từ chối</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.btn, styles.btnApprove]} onPress={() => handleApprove(item._id)}>
-          <Text style={styles.btnText}>Duyệt</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const filteredClasses = MOCK_CLASSES.filter(item => {
+    const searchLower = searchText.toLowerCase();
+    return (
+      item.name.toLowerCase().includes(searchLower) ||
+      item.code.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
     <View style={styles.container}>
-      <View style={styles.screenHeader}>
-         <Text style={styles.title}>Quản lý đơn nghỉ</Text>
-         <TouchableOpacity onPress={onLogout} style={styles.logoutBtn}>
-            <Text style={styles.logoutText}>Logout</Text>
-         </TouchableOpacity>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onLogout}>
+          <Ionicons name="log-out-outline" size={24} color="#202244" />
+        </TouchableOpacity>
       </View>
-      
-      {loading ? (
-        <ActivityIndicator size="large" color="#E6A8D7" />
-      ) : (
-        <FlatList
-          data={requests}
-          renderItem={renderItem}
-          keyExtractor={item => item._id}
-          contentContainerStyle={styles.list}
-          ListEmptyComponent={<Text style={styles.empty}>Không có đơn nào chờ duyệt.</Text>}
+
+      <View style={styles.titleRow}>
+        <Text style={styles.screenTitle}>My classroom</Text>
+        <GradientButton
+          title="Tạo lớp mới"
+          onPress={() => setCreateModalVisible(true)}
+          style={styles.createButtonContainer}
+          textStyle={styles.createButtonText}
         />
-      )}
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Feather name="search" size={20} color="#999" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search for.."
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholderTextColor="#999"
+        />
+      </View>
+
+      {/* List */}
+      <ClassList
+        data={filteredClasses}
+        searchText={searchText}
+        onPressItem={(item) => navigation.navigate('ClassDetail', { classData: item })}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No classes found matching "{searchText}"</Text>
+        }
+      />
+
+      {/* Create Class Modal */}
+      <CreateClassModal
+        visible={createModalVisible}
+        onClose={() => setCreateModalVisible(false)}
+      />
     </View>
   );
 }
@@ -94,99 +77,60 @@ export default function InstructorHomeScreen({ navigation, user, onLogout }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 20,
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
     paddingTop: 50,
   },
-  screenHeader: {
+  header: {
+    marginBottom: 10,
+  },
+  titleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
   },
-  title: {
+  screenTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000',
+    fontFamily: 'Roboto',
   },
-  logoutBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    backgroundColor: '#ddd',
-    borderRadius: 8,
+  createButtonContainer: {
+    borderRadius: 20,
   },
-  logoutText: {
-    color: '#333',
-    fontWeight: '600'
-  },
-  list: {
-    paddingBottom: 20,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 15,
-    elevation: 2,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  studentName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  statusBadge: {
-    backgroundColor: '#FFF4E5',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  statusText: {
-    color: '#FF9800',
-    fontWeight: '600',
+  createButtonText: {
     fontSize: 12,
   },
-  classInfo: {
-    color: '#666',
-    marginBottom: 10,
-    fontStyle: 'italic',
-  },
-  detailRow: {
+  searchContainer: {
     flexDirection: 'row',
-    marginBottom: 5,
-  },
-  label: {
-    fontWeight: '600',
-    width: 60,
-    color: '#555',
-  },
-  value: {
-    color: '#333',
-    flex: 1,
-  },
-  actions: {
-    flexDirection: 'row',
-    marginTop: 15,
-    justifyContent: 'flex-end',
-    gap: 10,
-  },
-  btn: {
-    paddingVertical: 8,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 15,
     paddingHorizontal: 15,
-    borderRadius: 8,
+    height: 50,
+    marginBottom: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#f0f0f0'
   },
-  btnReject: {
-    backgroundColor: '#FFEBEE',
+  searchIcon: {
+    marginRight: 10,
   },
-  btnApprove: {
-    backgroundColor: '#E8F5E9',
-  },
-  btnText: {
-    fontWeight: 'bold',
+  searchInput: {
+    flex: 1,
     fontSize: 14,
+    fontFamily: 'Roboto',
+    color: '#333',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#999',
+    marginTop: 20,
+    fontFamily: 'Roboto',
   }
 });
