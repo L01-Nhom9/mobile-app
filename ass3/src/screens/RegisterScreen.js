@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import mockApi from '../services/mockApi';
+import { authService } from '../services/authService';
 
 export default function RegisterScreen({ navigation }) {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(''); // Not used in backend register request, but kept if needed for UI locally, actually backend needs email.
+  // Wait, backend RegisterRequest is: email, password, fullName, role. It does NOT have username.
+  // I should prioritize Email as the identifier. 
+  // The original UI had "Username" input. I will replace "Username" with "Full Name" or keep it if it maps to something?
+  // Looking at backend: RegisterRequest has {email, password, fullName, role}.
+  // So I should have: Full Name, Email, Password. 
+
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('STUDENT'); // Default role 'STUDENT'
 
   const handleRegister = async () => {
-    if (!username || !password || !email) {
+    if (!fullName || !password || !email) {
        Alert.alert('Error', 'Please fill all fields');
        return;
     }
@@ -20,14 +28,13 @@ export default function RegisterScreen({ navigation }) {
     }
 
     try {
-      // In a real app, this would call an API
-      // await mockApi.auth.register({ username, password, email });
+      await authService.register(email, password, fullName, role);
       Alert.alert('Success', 'Registration successful!', [
           { text: 'OK', onPress: () => navigation.navigate('Login') }
       ]);
     } catch (error) {
       console.log('Register error:', error);
-      Alert.alert('Error', 'Registration failed');
+      Alert.alert('Error', 'Registration failed. Please try again.');
     }
   };
 
@@ -44,10 +51,10 @@ export default function RegisterScreen({ navigation }) {
           
            <TextInput
             style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
+            placeholder="Full Name"
+            value={fullName}
+            onChangeText={setFullName}
+            autoCapitalize="words"
             placeholderTextColor="#999"
           />
            <TextInput
@@ -75,6 +82,24 @@ export default function RegisterScreen({ navigation }) {
             secureTextEntry
             placeholderTextColor="#999"
           />
+
+          <View style={styles.roleContainer}>
+            <Text style={styles.roleLabel}>I am a:</Text>
+            <View style={styles.roleButtons}>
+                <TouchableOpacity 
+                    style={[styles.roleButton, role === 'STUDENT' && styles.roleButtonActive]}
+                    onPress={() => setRole('STUDENT')}
+                >
+                    <Text style={[styles.roleButtonText, role === 'STUDENT' && styles.roleButtonTextActive]}>Student</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={[styles.roleButton, role === 'INSTRUCTOR' && styles.roleButtonActive]}
+                    onPress={() => setRole('INSTRUCTOR')}
+                >
+                    <Text style={[styles.roleButtonText, role === 'INSTRUCTOR' && styles.roleButtonTextActive]}>Instructor</Text>
+                </TouchableOpacity>
+            </View>
+          </View>
 
           <TouchableOpacity onPress={handleRegister} style={styles.buttonContainer}>
             <LinearGradient
@@ -137,6 +162,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     fontFamily: 'Roboto',
+  },
+  roleContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  roleLabel: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 10,
+    fontFamily: 'Roboto',
+    textAlign: 'center' // Centered label
+  },
+  roleButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10, 
+  },
+  roleButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 15,
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+  },
+  roleButtonActive: {
+    backgroundColor: '#EDF5FF', // Light blue tint
+    borderColor: '#93C5FD',
+  },
+  roleButtonText: {
+    color: '#666',
+    fontWeight: '600',
+  },
+  roleButtonTextActive: {
+    color: '#2563EB', // Active blue color
+    fontWeight: 'bold',
   },
   buttonContainer: {
     width: '60%', 
