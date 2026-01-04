@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import mockApi from '../services/mockApi';
+import { authService } from '../services/authService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation, onLogin }) {
-  const [username, setUsername] = useState('student');
-  const [password, setPassword] = useState('123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
-      const response = await mockApi.auth.login({ username, password });
-      onLogin(response.data);
+      const response = await authService.login(email, password);
+      // response is the user object from authService: { email, role, accessToken, refreshToken }
+      
+      if (response && response.accessToken) {
+          // Token is already stored in AsyncStorage by authService.login()
+          onLogin(response); 
+      } else {
+           Alert.alert('Error', 'Login failed: No token received');
+      }
+
     } catch (error) {
       console.log('Login error:', error);
       Alert.alert('Error', 'Invalid credentials');
@@ -30,19 +39,20 @@ export default function LoginScreen({ navigation, onLogin }) {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.card}>
-          <Text style={styles.title}>WELLCOME TO CLASSTRACK</Text>
+          <Text style={styles.title}>WELCOME TO CLASSTRACK</Text>
           
           <TextInput
             style={styles.input}
-            placeholder="Tên đăng nhập"
-            value={username}
-            onChangeText={setUsername}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
             autoCapitalize="none"
+            keyboardType="email-address"
             placeholderTextColor="#999"
           />
           <TextInput
             style={styles.input}
-            placeholder="Mật khẩu"
+            placeholder="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
