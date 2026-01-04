@@ -10,6 +10,7 @@ import com.classtrack.backend.service.LeaveRequestService;
 import com.classtrack.backend.entity.User;
 import com.classtrack.backend.repository.UserRepository;
 import com.classtrack.backend.repository.LeaveRequestRepository;
+import com.classtrack.backend.entity.Classroom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -115,6 +116,29 @@ public class LeaveRequestController {
                 .toList();
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/instructor/{studentRequestId}")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<LeaveRequestInfo> getRequestDetailForInstructor(
+            @PathVariable Long studentRequestId,
+            Principal principal
+    ) {
+        User instructor = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        LeaveRequest request = leaveRequestRepo.findById(studentRequestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        Classroom classroom = request.getClassroom();
+
+        if (!classroom.getInstructor().getId().equals(instructor.getId())) {
+            throw new RuntimeException("You are not allowed to view this request");
+        }
+
+        return ResponseEntity.ok(LeaveRequestInfo.fromEntity(request));
+    }
+
+
 
     @PostMapping("/{requestId}/approve")
     @PreAuthorize("hasRole('INSTRUCTOR')")

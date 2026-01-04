@@ -7,9 +7,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 public record LeaveRequestResponse(
         Long id,
+        String classroomId,
         String classroomName,
         LocalDate absenceDate,
         String status,
+        String approvedBy,
         String evidenceFilePath
 ) {
     public static LeaveRequestResponse fromEntity(LeaveRequest lr) {
@@ -22,9 +24,11 @@ public record LeaveRequestResponse(
         }
         return new LeaveRequestResponse(
                 lr.getId(),
+                lr.getClassroom().getId(),
                 lr.getClassroom().getName(),
                 lr.getAbsenceDate(),
                 lr.getStatus().name(),
+                lr.getApprovedBy() != null ? lr.getApprovedBy().getFullName() : null,
                 evidenceUrl
         );
     }

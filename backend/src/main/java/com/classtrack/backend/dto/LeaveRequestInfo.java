@@ -19,7 +19,7 @@ public record LeaveRequestInfo(
         LeaveRequest.Status status,
         String denialReason,
 
-        String approvedByEmail,
+        String approvedBy,
         LocalDateTime approvedAt,
         LocalDateTime createdAt
 ) {
@@ -45,7 +45,7 @@ public record LeaveRequestInfo(
                         ? lr.getDenialReason()
                         : null,
 
-                lr.getApprovedBy() != null ? lr.getApprovedBy().getEmail() : null,
+                lr.getApprovedBy() != null ? lr.getApprovedBy().getFullName() : null,
                 lr.getApprovedAt(),
                 lr.getCreatedAt()
         );

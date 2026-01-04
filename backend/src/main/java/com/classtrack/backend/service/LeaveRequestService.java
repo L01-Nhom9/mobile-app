@@ -58,6 +58,9 @@ public class LeaveRequestService {
     }
 
     public List<LeaveRequest> getMyRequestsWithFilter(User student, LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return repo.findByStudent(student);
+        }
         return repo.findByStudentWithFilter(student.getId(), startDate, endDate);
     }
 
@@ -67,7 +70,6 @@ public class LeaveRequestService {
         if (!classroom.getInstructor().equals(instructor)) {
             throw new RuntimeException("Not authorized");
         }
-        // Nếu không có filter tuần, dùng method cũ
         if (startDate == null || endDate == null) {
             return repo.findByClassroomAndStatus(classroom, LeaveRequest.Status.PENDING);
         }
