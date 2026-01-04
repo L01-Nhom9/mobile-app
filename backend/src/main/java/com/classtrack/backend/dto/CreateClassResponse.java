@@ -5,6 +5,7 @@ import com.classtrack.backend.entity.Classroom;
 public record CreateClassResponse(
         String id,
         String name,
+        String instructor,
         String description,
         String joinCode
 ) {
@@ -12,6 +13,7 @@ public record CreateClassResponse(
         return new CreateClassResponse(
                 c.getId(),
                 c.getName(),
+                c.getInstructor().getFullName(),
                 c.getDescription(),
                 c.getJoinCode()
         );
