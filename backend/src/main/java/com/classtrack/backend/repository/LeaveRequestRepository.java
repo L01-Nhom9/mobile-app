@@ -15,6 +15,17 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     List<LeaveRequest> findByClassroom(Classroom classroom);
     List<LeaveRequest> findByClassroomAndStudent(Classroom classroom, User student);
 
+    @Query("SELECT lr.student.id, COUNT(lr.id), " +
+           "SUM(CASE WHEN lr.status = 'APPROVED' THEN 1 ELSE 0 END), " +
+           "SUM(CASE WHEN lr.status = 'REJECTED' THEN 1 ELSE 0 END) " +
+           "FROM LeaveRequest lr " +
+           "WHERE lr.classroom.id = :classId " +
+           "AND lr.absenceDate BETWEEN :from AND :to " +
+           "GROUP BY lr.student.id")
+    List<Object[]> getAttendanceAggregates(@Param("classId") String classId,
+                                           @Param("from") LocalDate from,
+                                           @Param("to") LocalDate to);
+
     // Lọc pending theo lớp và tuần (từ startDate đến endDate)
     @Query("SELECT lr FROM LeaveRequest lr WHERE lr.classroom.id = :classroomId " +
            "AND lr.status = 'PENDING' " +

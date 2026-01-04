@@ -1,4 +1,4 @@
-package com.classtrack.backend.leaverequest;
+package com.classtrack.backend.controller;
 
 import com.classtrack.backend.entity.LeaveRequest;
 import com.classtrack.backend.dto.LeaveRequestResponse;
@@ -23,16 +23,12 @@ import java.io.IOException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.core.io.UrlResource;
 
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.io.IOException;
 import java.nio.file.Files;
 
 @RestController
@@ -64,7 +60,6 @@ public class LeaveRequestController {
     }
 
 
-    // STUDENT: Xóa đơn xin nghỉ (chỉ khi còn PENDING)
     @DeleteMapping("/{requestId}")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Void> deleteRequest(@PathVariable Long requestId, Principal principal) {
