@@ -15,6 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +54,31 @@ public class LeaveRequestService {
                 .build();
 
         return repo.save(request);
+    }
+
+    @Transactional
+    public void deleteLeaveRequest(Long requestId, User student) {
+        LeaveRequest request = repo.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        if (!request.getStudent().equals(student)) {
+            throw new RuntimeException("You can only delete your own request");
+        }
+
+        if (request.getStatus() != LeaveRequest.Status.PENDING) {
+            throw new RuntimeException("Cannot delete request that has been processed");
+        }
+
+        // Xóa file minh chứng trên server
+        if (request.getEvidenceFilePath() != null) {
+            try {
+                Files.deleteIfExists(Paths.get(request.getEvidenceFilePath()));
+            } catch (IOException e) {
+                System.err.println("Could not delete evidence file: " + request.getEvidenceFilePath());
+            }
+        }
+
+        repo.delete(request);
     }
 
     public List<LeaveRequest> getMyRequests(User student) {

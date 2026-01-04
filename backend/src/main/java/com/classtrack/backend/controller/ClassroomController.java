@@ -4,6 +4,7 @@ import com.classtrack.backend.dto.CreateClassRequest;
 import com.classtrack.backend.dto.JoinRequest;
 import com.classtrack.backend.dto.CreateClassResponse;
 import com.classtrack.backend.dto.StudentInfo;
+import com.classtrack.backend.dto.UpdateClassRequest;
 import com.classtrack.backend.service.JwtService;
 import com.classtrack.backend.entity.User;
 import com.classtrack.backend.repository.UserRepository;
@@ -36,6 +37,35 @@ public class ClassroomController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{classId}")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<Void> deleteClass(@PathVariable String classId, Principal principal) {
+        User instructor = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        service.deleteClassroom(classId, instructor);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{classId}")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<CreateClassResponse> updateClassroom(
+            @PathVariable String classId,
+            @RequestBody UpdateClassRequest req,
+            Principal principal
+    ) {
+        User instructor = getCurrentUser(principal);
+        Classroom classroom = service.updateClassroom(
+                classId,
+                req.name(),
+                req.description(),
+                instructor
+        );
+
+        return ResponseEntity.ok(CreateClassResponse.fromEntity(classroom));
+    }
+
+
     @GetMapping("/my-teaching")
     @PreAuthorize("hasRole('INSTRUCTOR')")
     public ResponseEntity<List<CreateClassResponse>> myTeaching(Principal principal) {
@@ -64,6 +94,16 @@ public class ClassroomController {
         User student = getCurrentUser(principal);
         service.joinClassByCode(req.joinCode(), student);
         return ResponseEntity.ok("Joined successfully");
+    }
+
+    @DeleteMapping("/leave/{classId}")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Void> leaveClass(@PathVariable String classId, Principal principal) {
+        User student = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        service.leaveClass(classId, student);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/my-enrolled")

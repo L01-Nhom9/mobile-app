@@ -6,6 +6,7 @@ import com.classtrack.backend.entity.Classroom;
 import com.classtrack.backend.entity.Enrollment;
 import com.classtrack.backend.repository.ClassroomRepository;
 import com.classtrack.backend.repository.EnrollmentRepository;
+import com.classtrack.backend.repository.LeaveRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class ClassroomService {
     private final ClassroomRepository classroomRepo;
     private final EnrollmentRepository enrollmentRepo;
     private final UserRepository userRepo;
+    private final LeaveRequestRepository leaveRequestRepo;
     private final JoinCodeGenerator codeGenerator;
 
 
@@ -42,6 +44,51 @@ public class ClassroomService {
 
         return classroomRepo.save(classroom);
     }
+
+    @Transactional
+    public void deleteClassroom(String classId, User instructor) {
+        Classroom classroom = classroomRepo.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Class not found"));
+
+        if (!classroom.getInstructor().equals(instructor)) {
+            throw new RuntimeException("You can only delete your own class");
+        }
+
+        if (!classroom.getEnrollments().isEmpty()) {
+            throw new RuntimeException("Cannot delete class with enrolled students");
+        }
+
+        if (!leaveRequestRepo.findByClassroom(classroom).isEmpty()) {
+            throw new RuntimeException("Cannot delete class with leave requests");
+        }
+
+        classroomRepo.delete(classroom);
+    }
+
+    public Classroom updateClassroom(
+            String classId,
+            String name,
+            String description,
+            User instructor
+    ) {
+        Classroom classroom = classroomRepo.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+
+        if (!classroom.getInstructor().getId().equals(instructor.getId())) {
+            throw new RuntimeException("You are not allowed to update this classroom");
+        }
+
+        if (name != null && !name.isBlank()) {
+            classroom.setName(name);
+        }
+
+        if (description != null) {
+            classroom.setDescription(description);
+        }
+
+        return classroomRepo.save(classroom);
+    }
+
 
     public List<Classroom> getMyTeachingClasses(User instructor) {
         return classroomRepo.findByInstructorId(instructor.getId());
@@ -72,6 +119,22 @@ public class ClassroomService {
                 .build();
 
         enrollmentRepo.save(enrollment);
+    }
+
+    @Transactional
+    public void leaveClass(String classId, User student) {
+        Classroom classroom = classroomRepo.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Class not found"));
+
+        Enrollment enrollment = enrollmentRepo.findByClassroomAndStudent(classroom, student)
+                .orElseThrow(() -> new RuntimeException("You are not enrolled in this class"));
+
+        // Nếu đã có đơn xin nghỉ liên quan đến lớp này thì không cho rời
+        if (!leaveRequestRepo.findByClassroomAndStudent(classroom, student).isEmpty()) {
+            throw new RuntimeException("Cannot leave class with pending leave requests");
+        }
+
+        enrollmentRepo.delete(enrollment);
     }
 
     public List<Classroom> getMyEnrolledClasses(User student) {

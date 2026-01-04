@@ -63,6 +63,18 @@ public class LeaveRequestController {
         return ResponseEntity.ok(LeaveRequestResponse.fromEntity(request));
     }
 
+
+    // STUDENT: Xóa đơn xin nghỉ (chỉ khi còn PENDING)
+    @DeleteMapping("/{requestId}")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Void> deleteRequest(@PathVariable Long requestId, Principal principal) {
+        User student = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        service.deleteLeaveRequest(requestId, student);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/my-requests")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<LeaveRequestResponse>> myRequests(

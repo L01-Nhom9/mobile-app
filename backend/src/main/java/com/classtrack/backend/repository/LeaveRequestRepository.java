@@ -12,6 +12,8 @@ import java.time.LocalDate;
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long> {
     List<LeaveRequest> findByClassroomAndStatus(Classroom classroom, LeaveRequest.Status status);
     List<LeaveRequest> findByStudent(User student);
+    List<LeaveRequest> findByClassroom(Classroom classroom);
+    List<LeaveRequest> findByClassroomAndStudent(Classroom classroom, User student);
 
     // Lọc pending theo lớp và tuần (từ startDate đến endDate)
     @Query("SELECT lr FROM LeaveRequest lr WHERE lr.classroom.id = :classroomId " +

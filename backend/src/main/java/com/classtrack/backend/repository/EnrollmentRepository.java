@@ -9,5 +9,6 @@ import java.util.List;
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findByClassroomId(String classroomId);
     List<Enrollment> findByStudent(User student);
+    java.util.Optional<Enrollment> findByClassroomAndStudent(Classroom classroom, User student);
     boolean existsByStudentAndClassroom(User student, Classroom classroom);
 }
