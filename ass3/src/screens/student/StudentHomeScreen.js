@@ -1,26 +1,79 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import GradientButton from '../../components/Button';
 import ClassList from '../../components/ClassList';
+import { classroomService } from '../../services/classroomService';
+import { useFocusEffect } from '@react-navigation/native';
 
-// Mock data to match the UI screenshot
-const MOCK_CLASSES = [
-  { _id: '1', name: 'Quản lý dự án', code: 'CO3007', instructor: 'TRẦN VĂN HOÀI', color: '#93C5FD' },
-  { _id: '2', name: 'Đánh giá Hiệu năng Hệ thống', code: 'CO3007', instructor: 'BÙI XUÂN GIANG', color: '#C084FC' },
-  { _id: '3', name: 'Phát triển ứng dụng thiết bị di động', code: 'CO3007', instructor: 'HOÀNG LÊ HẢI THANH', color: '#FCD34D' },
-];
+const CARD_COLORS = ['#93C5FD', '#C084FC', '#FCD34D', '#86EFAC', '#FDA4AF', '#FDBA74'];
 
 export default function StudentHomeScreen({ navigation, onLogout }) {
   const [searchText, setSearchText] = useState('');
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchClasses = async () => {
+    try {
+      const data = await classroomService.getEnrolledClasses();
+      // Map API data to UI format
+      const mappedClasses = data.map((item, index) => ({
+        _id: item.id,
+        name: item.name,
+        code: item.joinCode, // Mapping joinCode to code
+        instructor: item.Instructor || item.instructor, 
+        color: CARD_COLORS[index % CARD_COLORS.length]
+      }));
+      setClasses(mappedClasses);
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLeaveClass = (item) => {
+    Alert.alert(
+      'Rời lớp học',
+      `Bạn có chắc chắn muốn rời lớp "${item.name}" không?`,
+      [
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+        {
+          text: 'Rời lớp',
+          style: 'destructive',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              await classroomService.leaveClass(item._id);
+              Alert.alert('Thành công', 'Đã rời lớp học thành công.');
+              fetchClasses(); // Refresh list
+            } catch (error) {
+              console.log('Leave class error:', error);
+              Alert.alert('Lỗi', 'Không thể rời lớp học. Vui lòng thử lại.');
+              setLoading(false); // Only set loading false on error, success will re-fetch which sets loading
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchClasses();
+    }, [])
+  );
 
   // Filter classes based on search text
-  const filteredClasses = MOCK_CLASSES.filter(item => {
+  const filteredClasses = classes.filter(item => {
     const searchLower = searchText.toLowerCase();
     return (
       item.name.toLowerCase().includes(searchLower) ||
-      item.code.toLowerCase().includes(searchLower) ||
-      item.instructor.toLowerCase().includes(searchLower)
+      (item.code && item.code.toLowerCase().includes(searchLower)) ||
+      (item.instructor && item.instructor.toLowerCase().includes(searchLower))
     );
   });
 
@@ -56,14 +109,21 @@ export default function StudentHomeScreen({ navigation, onLogout }) {
       </View>
 
       {/* List */}
-      <ClassList
-        data={filteredClasses}
-        searchText={searchText}
-        onPressItem={(item) => navigation.navigate('RequestForm', { classroom: item })}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No classes found matching "{searchText}"</Text>
-        }
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#93C5FD" style={{ marginTop: 20 }} />
+      ) : (
+        <ClassList
+          data={filteredClasses}
+          searchText={searchText}
+          onPressItem={(item) => navigation.navigate('RequestForm', { classroom: item })}
+          onLeave={handleLeaveClass}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {classes.length === 0 ? "You haven't joined any classes yet." : `No classes found matching "${searchText}"`}
+            </Text>
+          }
+        />
+      )}
     </View>
   );
 }
@@ -128,3 +188,4 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
   }
 });
+

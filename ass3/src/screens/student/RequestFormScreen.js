@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal, Image, ScrollView, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal, Image, ScrollView, Platform, ActivityIndicator } from 'react-native';
+import { Ionicons, Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import mockApi from '../../services/mockApi';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import GradientButton from '../../components/Button';
+import { requestService } from '../../services/requestService';
 
 const REASONS = ['Đau ốm', 'Chuyện gia đình', 'Phương tiện di chuyển', 'Khác'];
-const SESSIONS = ['T2 28/11 7h00-9h50', 'T5 03/12 15h00-16h50'];
 
 export default function RequestFormScreen({ route, navigation, user }) {
     const { classroom } = route.params;
     const [reason, setReason] = useState(null);
-    const [session, setSession] = useState(null);
+    const [absenceDate, setAbsenceDate] = useState(new Date());
     const [proofImage, setProofImage] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     // Dropdown States
     const [showReasonPicker, setShowReasonPicker] = useState(false);
-    const [showSessionPicker, setShowSessionPicker] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const handlePickImage = async () => {
-        // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 1,
+            quality: 0.8,
         });
 
         if (!result.canceled) {
@@ -42,7 +42,7 @@ export default function RequestFormScreen({ route, navigation, user }) {
         let result = await ImagePicker.launchCameraAsync({
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 1,
+            quality: 0.8,
         });
 
         if (!result.canceled) {
@@ -62,26 +62,72 @@ export default function RequestFormScreen({ route, navigation, user }) {
         );
     }
 
+    const onDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || absenceDate;
+        setShowDatePicker(Platform.OS === 'ios');
+        setAbsenceDate(currentDate);
+    };
+
+    const formatDate = (date) => {
+        return date.toISOString().split('T')[0]; // YYYY-MM-DD
+    };
+
     const handleSubmit = async () => {
-        if (!reason || !session) {
-            Alert.alert('Thiếu thông tin', 'Vui lòng chọn lý do và buổi nghỉ.');
+        if (!reason) {
+            Alert.alert('Thiếu thông tin', 'Vui lòng chọn lý do.');
             return;
         }
 
+        // Validate date (must be in future? User said "future")
+        // Just checking it's not today or past? Or just allow any date user picks if they really need to.
+        // Prompt said "chọn một ngày trong tương lai". I'll warn if it's past but let's assume the picker minDate handles basic constraint if we wanted.
+        // For now, I'll trust the user input or add a simple check.
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        if (absenceDate < today) {
+             Alert.alert('Ngày không hợp lệ', 'Vui lòng chọn ngày trong tương lai (hoặc hôm nay).');
+             return;
+        }
+
+        setLoading(true);
         try {
-            await mockApi.requests.create({
-                studentId: user._id,
-                classroomId: classroom._id,
-                reason,
-                session, // Assuming date/time extraction happens on backend or this string is verified
-                proofImage
-            });
-            // Use standard Alert or custom success modal. Using Alert for simplicity.
+            const formData = new FormData();
+            formData.append('classroomId', classroom._id);
+            formData.append('absenceDate', formatDate(absenceDate));
+            formData.append('reason', reason);
+            
+            if (proofImage) {
+                // Get filename
+                const filename = proofImage.split('/').pop();
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : `image`;
+
+                formData.append('evidence', {
+                    uri: proofImage,
+                    name: filename,
+                    type: type,
+                });
+            }
+
+            await requestService.submitLeaveRequest(formData);
+
             Alert.alert('Thành công', 'Đã gửi đơn xin nghỉ!', [
                 { text: 'OK', onPress: () => navigation.goBack() }
             ]);
         } catch (error) {
-            Alert.alert('Lỗi', 'Không thể gửi đơn.');
+            console.error('Submit Error:', error);
+            let msg = 'Không thể gửi đơn. Vui lòng thử lại.';
+            if (error.response) {
+                msg += `\nStatus: ${error.response.status}`;
+                if (error.response.data) {
+                    msg += `\nData: ${JSON.stringify(error.response.data)}`;
+                }
+            } else {
+                msg += `\nError: ${error.message}`;
+            }
+            Alert.alert('Lỗi', msg);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -130,13 +176,26 @@ export default function RequestFormScreen({ route, navigation, user }) {
                         <Ionicons name="caret-down" size={16} color="#999" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.picker} onPress={() => setShowSessionPicker(true)}>
-                        <Text style={[styles.pickerText, !session && styles.placeholder]}>
-                            {session ? (session.length > 15 ? session.substring(0, 12) + '...' : session) : 'Buổi'}
+                    <TouchableOpacity style={styles.picker} onPress={() => setShowDatePicker(true)}>
+                        <Text style={styles.pickerText}>
+                            {formatDate(absenceDate)}
                         </Text>
-                        <Ionicons name="caret-down" size={16} color="#999" />
+                        <Feather name="calendar" size={16} color="#999" />
                     </TouchableOpacity>
                 </View>
+
+                {/* Date Picker */}
+                {showDatePicker && (
+                    <DateTimePicker
+                        testID="dateTimePicker"
+                        value={absenceDate}
+                        mode="date"
+                        is24Hour={true}
+                        display="default"
+                        onChange={onDateChange}
+                        minimumDate={new Date()} // Ensure future/today
+                    />
+                )}
 
                 {/* Dropdowns */}
                 <RenderDropdown
@@ -145,13 +204,6 @@ export default function RequestFormScreen({ route, navigation, user }) {
                     onSelect={setReason}
                     onClose={() => setShowReasonPicker(false)}
                 />
-                <RenderDropdown
-                    visible={showSessionPicker}
-                    options={SESSIONS}
-                    onSelect={setSession}
-                    onClose={() => setShowSessionPicker(false)}
-                />
-
 
                 {/* Proof Area */}
                 <TouchableOpacity style={styles.proofArea} onPress={showImageOptions}>
@@ -166,11 +218,15 @@ export default function RequestFormScreen({ route, navigation, user }) {
                 </TouchableOpacity>
 
                 {/* Submit Button */}
-                <GradientButton
-                    title="Nộp đơn"
-                    onPress={handleSubmit}
-                    style={styles.submitContainer}
-                />
+                {loading ? (
+                    <ActivityIndicator size="large" color="#93C5FD" />
+                ) : (
+                    <GradientButton
+                        title="Nộp đơn"
+                        onPress={handleSubmit}
+                        style={styles.submitContainer}
+                    />
+                )}
 
             </View>
         </View>
@@ -257,14 +313,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 150,
         borderWidth: 1,
-        borderColor: '#ddd', // Could make dashed if easy, but solid is fine
+        borderColor: '#ddd', 
         borderRadius: 20,
         marginBottom: 25,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
-        // Shadow for inner feel? Or simple flat. Let's do simple flat as per image mostly.
         elevation: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
@@ -312,3 +367,4 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto',
     }
 });
+

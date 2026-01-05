@@ -4,16 +4,18 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 const FormList = ({ data }) => {
 
     const getStatusColor = (status) => {
-        switch (status) {
-            case 'pending': return { color: '#C084FC', borderColor: '#C084FC', bg: '#F3E8FF' }; 
-            case 'approved': return { color: '#4ADE80', borderColor: '#4ADE80', bg: '#DCFCE7' };
-            case 'rejected': return { color: '#F87171', borderColor: '#F87171', bg: '#FEE2E2' };
+        const s = status ? status.toLowerCase() : '';
+        switch (s) {
+            case 'pending': return { color: '#F59E0B', borderColor: '#F59E0B', bg: '#FEF3C7' }; 
+            case 'approved': return { color: '#10B981', borderColor: '#10B981', bg: '#D1FAE5' };
+            case 'rejected': return { color: '#EF4444', borderColor: '#EF4444', bg: '#FEE2E2' };
             default: return { color: '#999', borderColor: '#999', bg: '#eee' };
         }
     };
 
     const getStatusText = (status) => {
-        switch (status) {
+        const s = status ? status.toLowerCase() : '';
+        switch (s) {
             case 'pending': return 'CHỜ DUYỆT';
             case 'approved': return 'ĐÃ DUYỆT';
             case 'rejected': return 'TỪ CHỐI';
