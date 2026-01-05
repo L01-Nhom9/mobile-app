@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const ClassList = ({ data, onPressItem, ListEmptyComponent, searchText }) => {
+const ClassList = ({ data, onPressItem, onLeave, ListEmptyComponent, searchText }) => {
     const ITEMS_PER_PAGE = 5;
 
     const renderItem = ({ item }) => (
@@ -17,6 +17,9 @@ const ClassList = ({ data, onPressItem, ListEmptyComponent, searchText }) => {
                     <Text style={styles.classDetails}>({item.code})_{item.instructor}</Text>
                     <View style={[styles.progressBar, { backgroundColor: item.color }]} />
                 </View>
+                <TouchableOpacity onPress={() => onLeave && onLeave(item)} style={styles.leaveBtn}>
+                     <Ionicons name="log-out-outline" size={24} color="#EF4444" />
+                </TouchableOpacity>
                 <Ionicons name="chevron-forward" size={24} color="#93C5FD" />
             </View>
         </TouchableOpacity>
@@ -79,6 +82,10 @@ const styles = StyleSheet.create({
     cardInfo: {
         flex: 1,
         marginRight: 10,
+    },
+    leaveBtn: {
+        padding: 5,
+        marginRight: 5,
     },
     className: {
         fontSize: 16,
