@@ -1,26 +1,49 @@
-
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import GradientButton from '../../components/Button';
 import ClassList from '../../components/ClassList';
 import CreateClassModal from '../../components/CreateClassModal';
-
-const MOCK_CLASSES = [
-  { _id: '1', name: 'Quản lý dự án', code: 'CO3007', instructor: 'TRẦN VĂN HOÀI', color: '#93C5FD' },
-  { _id: '2', name: 'Đánh giá Hiệu năng Hệ thống', code: 'CO3007', instructor: 'BÙI XUÂN GIANG', color: '#C084FC' },
-  { _id: '3', name: 'Phát triển ứng dụng thiết bị di động', code: 'CO3007', instructor: 'HOÀNG LÊ HẢI THANH', color: '#FCD34D' },
-];
+import { classroomService } from '../../services/classroomService';
 
 export default function InstructorHomeScreen({ navigation, user, onLogout }) {
   const [searchText, setSearchText] = useState('');
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const filteredClasses = MOCK_CLASSES.filter(item => {
+  const fetchClasses = async () => {
+    setLoading(true);
+    try {
+      const data = await classroomService.getMyTeachingClasses();
+
+      const COLORS = ['#93C5FD', '#C084FC', '#FCD34D', '#F9A8D4', '#6EE7B7', '#FDBA74'];
+
+      const mappedData = (data || []).map((item, index) => ({
+        ...item,
+        _id: item.id,
+        code: item.id || item.code,
+        joinCode: item.joinCode || 'N/A',
+        instructor: user?.fullName || 'Me',
+        color: COLORS[index % COLORS.length] 
+      }));
+      setClasses(mappedData);
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể tải danh sách lớp học');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
+  const filteredClasses = classes.filter(item => {
     const searchLower = searchText.toLowerCase();
     return (
-      item.name.toLowerCase().includes(searchLower) ||
-      item.code.toLowerCase().includes(searchLower)
+      (item.name || '').toLowerCase().includes(searchLower) ||
+      (item.code || '').toLowerCase().includes(searchLower)
     );
   });
 
@@ -61,7 +84,11 @@ export default function InstructorHomeScreen({ navigation, user, onLogout }) {
         searchText={searchText}
         onPressItem={(item) => navigation.navigate('ClassDetail', { classData: item })}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No classes found matching "{searchText}"</Text>
+          loading ? (
+            <Text style={styles.emptyText}>Đang tải...</Text>
+          ) : (
+            <Text style={styles.emptyText}>No classes found matching "{searchText}"</Text>
+          )
         }
       />
 
@@ -69,6 +96,7 @@ export default function InstructorHomeScreen({ navigation, user, onLogout }) {
       <CreateClassModal
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
+        onSuccess={fetchClasses}
       />
     </View>
   );

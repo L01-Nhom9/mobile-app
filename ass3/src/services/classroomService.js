@@ -10,6 +10,30 @@ export const classroomService = {
     }
   },
 
+  getMyTeachingClasses: async () => {
+    try {
+      const response = await api.get('/classroom/my-teaching');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching teaching classes:', error);
+      throw error;
+    }
+  },
+
+  createClass: async (id, name, description) => {
+    try {
+      const response = await api.post('/classroom/create', {
+        id,
+        name,
+        description,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating class:', error.response?.data || error);
+      throw error;
+    }
+  },
+
   joinClass: async (joinCode) => {
     try {
       console.log('Joining class with code:', joinCode);

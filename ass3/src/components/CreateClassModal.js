@@ -2,22 +2,33 @@ import React, { useState } from 'react';
 import { View, Text, Modal, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GradientButton from './Button';
+import { classroomService } from '../services/classroomService';
 
-export default function CreateClassModal({ visible, onClose }) {
+export default function CreateClassModal({ visible, onClose, onSuccess }) {
     const [className, setClassName] = useState('');
     const [classCode, setClassCode] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
         if (!className.trim() || !classCode.trim()) {
             Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
             return;
         }
 
-        Alert.alert('Thành công', `Đã tạo lớp ${className} (${classCode})`);
+        setLoading(true);
+        try {
+            await classroomService.createClass(classCode.trim(), className.trim(), className.trim());
+            Alert.alert('Thành công', `Đã tạo lớp ${className} (${classCode})`);
 
-        setClassName('');
-        setClassCode('');
-        onClose();
+            setClassName('');
+            setClassCode('');
+            if (onSuccess) onSuccess();
+            onClose();
+        } catch (error) {
+            Alert.alert('Lỗi', 'Không thể tạo lớp học. Mã lớp có thể đã tồn tại.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

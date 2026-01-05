@@ -14,12 +14,10 @@ const ClassList = ({ data, onPressItem, onLeave, ListEmptyComponent, searchText 
             <View style={styles.cardContent}>
                 <View style={styles.cardInfo}>
                     <Text style={styles.className}>{item.name}</Text>
-                    <Text style={styles.classDetails}>({item.code})_{item.instructor}</Text>
+                    <Text style={styles.classDetails}>Code: {item.code} - Join Code: {item.joinCode}</Text>
+                    <Text style={styles.classDetails}>Giảng viên: {item.instructor}</Text>
                     <View style={[styles.progressBar, { backgroundColor: item.color }]} />
                 </View>
-                <TouchableOpacity onPress={() => onLeave && onLeave(item)} style={styles.leaveBtn}>
-                     <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-                </TouchableOpacity>
                 <Ionicons name="chevron-forward" size={24} color="#93C5FD" />
             </View>
         </TouchableOpacity>

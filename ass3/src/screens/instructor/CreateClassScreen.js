@@ -2,21 +2,32 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GradientButton from '../../components/Button';
+import { classroomService } from '../../services/classroomService'; // ← Thêm import
 
 export default function CreateClassScreen({ navigation }) {
     const [className, setClassName] = useState('');
     const [classCode, setClassCode] = useState('');
+    const [description, setDescription] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
         if (!className.trim() || !classCode.trim()) {
-            Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+            Alert.alert('Lỗi', 'Vui lòng nhập tên lớp và mã lớp');
             return;
         }
 
-        // Mock success
-        Alert.alert('Thành công', `Đã tạo lớp ${className} (${classCode})`, [
-            { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
+        setLoading(true);
+        try {
+            await classroomService.createClass(classCode.trim(), className.trim(), description.trim());
+            Alert.alert('Thành công', 'Đã tạo lớp học mới!', [
+                { text: 'OK', onPress: () => navigation.goBack() }
+            ]);
+        } catch (error) {
+            const msg = error.response?.data?.message || 'Đã có lỗi xảy ra';
+            Alert.alert('Thất bại', msg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -32,24 +43,35 @@ export default function CreateClassScreen({ navigation }) {
             <Text style={styles.label}>Tên lớp học</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Ví dụ: Quản lý dự án"
+                placeholder="Ví dụ: Phát triển ứng dụng di động"
                 value={className}
                 onChangeText={setClassName}
                 placeholderTextColor="#999"
             />
 
-            <Text style={styles.label}>Mã lớp học</Text>
+            <Text style={styles.label}>Mã lớp học (ID)</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Ví dụ: CO3007"
                 value={classCode}
                 onChangeText={setClassCode}
                 placeholderTextColor="#999"
+                autoCapitalize="characters"
+            />
+
+            <Text style={styles.label}>Mô tả lớp học (không bắt buộc)</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Ví dụ: Lớp học phần Mobile 2025"
+                value={description}
+                onChangeText={setDescription}
+                placeholderTextColor="#999"
             />
 
             <GradientButton
-                title="Tạo lớp"
+                title={loading ? "Đang tạo..." : "Tạo lớp"}
                 onPress={handleCreate}
+                disabled={loading}
                 style={styles.submitContainer}
             />
         </View>
