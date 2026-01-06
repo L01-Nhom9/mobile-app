@@ -20,6 +20,16 @@ export const classroomService = {
     }
   },
 
+  getStudentsInClass: async (classId) => {
+    try {
+      const response = await api.get(`/classroom/${classId}/students`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      throw error;
+    }
+  },
+
   createClass: async (id, name, description) => {
     try {
       const response = await api.post('/classroom/create', {
