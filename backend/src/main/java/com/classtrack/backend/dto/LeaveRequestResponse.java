@@ -14,16 +14,11 @@ public record LeaveRequestResponse(
         String status,
         String approvedBy,
         String denialReason,
-        String evidenceFilePath
+        String evidenceFileName,
+        String evidenceContentType
 ) {
     public static LeaveRequestResponse fromEntity(LeaveRequest lr) {
-        String evidenceUrl = null;
-        if (lr.getEvidenceFilePath() != null) {
-            evidenceUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                            .path("/api/leave-request/evidence/")
-                            .path(lr.getId().toString())
-                            .toUriString();
-        }
+
         return new LeaveRequestResponse(
                 lr.getId(),
                 lr.getStudent().getFullName(),
@@ -33,7 +28,8 @@ public record LeaveRequestResponse(
                 lr.getStatus().name(),
                 lr.getApprovedBy() != null ? lr.getApprovedBy().getFullName() : null,
                 lr.getDenialReason(),
-                evidenceUrl
+                lr.getEvidenceFileName(),
+                lr.getEvidenceContentType()
         );
     }
 }

@@ -13,10 +13,10 @@ import com.classtrack.backend.repository.LeaveRequestRepository;
 import com.classtrack.backend.entity.Classroom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -201,30 +201,32 @@ public class LeaveRequestController {
 
     @GetMapping("/evidence/{id}")
     @PreAuthorize("hasAnyRole('STUDENT','INSTRUCTOR')")
-    public ResponseEntity<Resource> viewEvidence(@PathVariable Long id) throws IOException {
+    public ResponseEntity<ByteArrayResource> getEvidence(
+            @PathVariable Long id) {
 
-        LeaveRequest lr = leaveRequestRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Leave request not found"));
-
-        Path path = Paths.get(lr.getEvidenceFilePath());
-        Resource resource = new UrlResource(path.toUri());
+        LeaveRequest leaveRequest = leaveRequestRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
 
 
-        if (!resource.exists()) {
-            return ResponseEntity.notFound().build();
+        // Nếu không có minh chứng
+        if (leaveRequest.getEvidence() == null || leaveRequest.getEvidence().length == 0) {
+            return ResponseEntity.noContent().build();
         }
 
-        String contentType = Files.probeContentType(path);
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
+        ByteArrayResource resource = new ByteArrayResource(leaveRequest.getEvidence());
+
+        String contentType = leaveRequest.getEvidenceContentType() != null
+                ? leaveRequest.getEvidenceContentType()
+                : "application/octet-stream";
+
+        String filename = leaveRequest.getEvidenceFileName() != null
+                ? leaveRequest.getEvidenceFileName()
+                : "evidence_" + id;
 
         return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
                 .contentType(MediaType.parseMediaType(contentType))
-                .header(
-                    HttpHeaders.CONTENT_DISPOSITION,
-                    "inline; filename=\"" + path.getFileName() + "\""
-                )
+                .contentLength(leaveRequest.getEvidence().length)
                 .body(resource);
     }
 

@@ -14,7 +14,9 @@ public record LeaveRequestInfo(
 
         LocalDate absenceDate,
         String reason,
-        String evidenceFilePath,
+
+        String evidenceFileName,   // Tên file gốc
+        String evidenceContentType,
 
         LeaveRequest.Status status,
         String denialReason,
@@ -24,13 +26,6 @@ public record LeaveRequestInfo(
         LocalDateTime createdAt
 ) {
     public static LeaveRequestInfo fromEntity(LeaveRequest lr) {
-        String evidenceUrl = null;
-        if (lr.getEvidenceFilePath() != null) {
-            evidenceUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                            .path("/api/leave-request/evidence/")
-                            .path(lr.getId().toString())
-                            .toUriString();
-        }
         return new LeaveRequestInfo(
                 lr.getId(),
                 lr.getClassroom().getId(),
@@ -38,7 +33,9 @@ public record LeaveRequestInfo(
 
                 lr.getAbsenceDate(),
                 lr.getReason(),
-                evidenceUrl,
+
+                lr.getEvidenceFileName(),
+                lr.getEvidenceContentType(),
 
                 lr.getStatus(),
                 lr.getStatus() == LeaveRequest.Status.REJECTED

@@ -7,6 +7,9 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import java.sql.Types;
+
 @Entity
 @Table(name = "leave_requests")
 @Getter
@@ -42,7 +45,15 @@ public class LeaveRequest {
     @Column(nullable = false)
     private String reason;
 
-    private String evidenceFilePath;
+    @Lob
+    @JdbcTypeCode(Types.BINARY)
+    @Column(name = "evidence", columnDefinition = "bytea")
+    private byte[] evidence;
+
+    private String evidenceFileName;
+
+    private String evidenceContentType;
+
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;

@@ -6,7 +6,8 @@ import com.classtrack.backend.repository.EnrollmentRepository;
 import com.classtrack.backend.entity.LeaveRequest;
 import com.classtrack.backend.repository.LeaveRequestRepository;
 import com.classtrack.backend.entity.User;
-import com.classtrack.backend.utils.FileStorageService;
+// import com.classtrack.backend.utils.FileStorageService;
+import com.classtrack.backend.utils.FileDatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +28,10 @@ public class LeaveRequestService {
     private final LeaveRequestRepository repo;
     private final ClassroomRepository classroomRepo;
     private final EnrollmentRepository enrollmentRepo;
-    private final FileStorageService fileStorageService;
+    private final FileDatabaseService fileDatabaseService;
 
     @Transactional
-    public LeaveRequest submitRequest(User student, String classroomId, LocalDate absenceDate, String reason, MultipartFile evidence) {
+    public LeaveRequest submitRequest(User student, String classroomId, LocalDate absenceDate, String reason, MultipartFile evidenceFile) {
         Classroom classroom = classroomRepo.findById(classroomId)
                 .orElseThrow(() -> new RuntimeException("Class not found"));
         if (!enrollmentRepo.existsByStudentAndClassroom(student, classroom)) {
@@ -42,17 +43,23 @@ public class LeaveRequestService {
         }
 
         // Lưu file
-        String filePath = fileStorageService.store(evidence);
+        // String filePath = fileStorageService.store(evidence);
 
         LeaveRequest request = LeaveRequest.builder()
                 .student(student)
                 .classroom(classroom)
                 .absenceDate(absenceDate)
                 .reason(reason)
-                .evidenceFilePath(filePath)
                 .status(LeaveRequest.Status.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
+
+        if (evidenceFile != null && !evidenceFile.isEmpty()) {
+            var fileData = fileDatabaseService.store(evidenceFile);
+            request.setEvidence(fileData.content());
+            request.setEvidenceFileName(fileData.fileName());
+            request.setEvidenceContentType(fileData.contentType());
+        }
 
         return repo.save(request);
     }
@@ -68,15 +75,6 @@ public class LeaveRequestService {
 
         if (request.getStatus() != LeaveRequest.Status.PENDING) {
             throw new RuntimeException("Cannot delete request that has been processed");
-        }
-
-        // Xóa file minh chứng trên server
-        if (request.getEvidenceFilePath() != null) {
-            try {
-                Files.deleteIfExists(Paths.get(request.getEvidenceFilePath()));
-            } catch (IOException e) {
-                System.err.println("Could not delete evidence file: " + request.getEvidenceFilePath());
-            }
         }
 
         repo.delete(request);
