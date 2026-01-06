@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -151,4 +152,20 @@ public class LeaveRequestService {
 
         return repo.save(request);
     }
+
+
+    public List<LeaveRequest> getLeaveRequestsByClassroom(String classroomId, User currentUser) {
+        Classroom classroom = classroomRepo.findById(classroomId)
+                .orElseThrow(() -> new IllegalArgumentException("Classroom not found"));
+        if (!classroom.getInstructor().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You are not the instructor of this classroom");
+        }
+        return repo.findByClassroomOrderByCreatedAtDesc(classroom);
+    }
+
+    public List<LeaveRequest> getAllLeaveRequestsForInstructor(User currentUser) {
+        return repo.findByClassroomInstructorOrderByCreatedAtDesc(currentUser);
+    }
+
+
 }

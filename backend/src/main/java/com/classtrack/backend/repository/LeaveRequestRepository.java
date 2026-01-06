@@ -12,8 +12,11 @@ import java.time.LocalDate;
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long> {
     List<LeaveRequest> findByClassroomAndStatus(Classroom classroom, LeaveRequest.Status status);
     List<LeaveRequest> findByStudent(User student);
+    List<LeaveRequest> findByClassroomInstructor(User instructor);
     List<LeaveRequest> findByClassroom(Classroom classroom);
     List<LeaveRequest> findByClassroomAndStudent(Classroom classroom, User student);
+    List<LeaveRequest> findByClassroomOrderByCreatedAtDesc(Classroom classroom);
+    List<LeaveRequest> findByClassroomInstructorOrderByCreatedAtDesc(User instructor);
 
     @Query("SELECT lr.student.id, COUNT(lr.id), " +
            "SUM(CASE WHEN lr.status = 'APPROVED' THEN 1 ELSE 0 END), " +

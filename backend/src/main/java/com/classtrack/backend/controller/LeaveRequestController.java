@@ -13,6 +13,7 @@ import com.classtrack.backend.repository.LeaveRequestRepository;
 import com.classtrack.backend.entity.Classroom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,6 +104,39 @@ public class LeaveRequestController {
         }
 
         return ResponseEntity.ok(LeaveRequestInfo.fromEntity(request));
+    }
+
+
+    @GetMapping("/classroom/{classroomId}")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<List<LeaveRequestResponse>> getLeaveRequestsByClassroom(
+            @PathVariable String classroomId, Principal principal) {
+
+        User currentUser = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<LeaveRequestResponse> response = service.getLeaveRequestsByClassroom(classroomId, currentUser)
+                .stream()
+                .map(LeaveRequestResponse::fromEntity)
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/my-all")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<List<LeaveRequestResponse>> getAllMyLeaveRequests(
+            Principal principal) {
+
+        User currentUser = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<LeaveRequestResponse> response = service.getAllLeaveRequestsForInstructor(currentUser)
+                .stream()
+                .map(LeaveRequestResponse::fromEntity)
+                .toList();
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{classroomId}/pending")
