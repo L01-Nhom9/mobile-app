@@ -19,7 +19,6 @@ export default function InstructorRequestCard({ item, onApprove, onReject, onPre
             <View style={styles.header}>
                 <View>
                     <Text style={styles.studentName}>{item.studentName}</Text>
-                    <Text style={styles.studentId}>{item.studentId}</Text>
                 </View>
 
                 {isPending && (

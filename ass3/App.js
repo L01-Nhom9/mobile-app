@@ -54,13 +54,12 @@ function InstructorTabs({ user, onLogout, navigation }) {
       <Tab.Screen name="InstructorHome" options={{ title: 'HOME' }}>
         {props => <InstructorHomeScreen {...props} user={user} onLogout={onLogout} />}
       </Tab.Screen>
-      <Tab.Screen name="Add" component={View} options={{ title: '' }} listeners={{
+      <Tab.Screen name="Add" component={View} options={{ title: '' }} listeners={({ navigation }) => ({
         tabPress: (e) => {
           e.preventDefault();
-          // Optional: Navigate to Create Class if desired, or keep as placeholder
-          // navigation.navigate('CreateClass');
+          navigation.navigate('InstructorHome', { openCreateModal: true });
         },
-      }} />
+      })} />
       <Tab.Screen name="List" component={InstructorRequestListScreen} options={{ title: 'LIST' }} />
     </Tab.Navigator>
   );

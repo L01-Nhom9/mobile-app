@@ -47,5 +47,43 @@ export const requestService = {
       } catch (error) {
           throw error;
       }
+  },
+
+  getRequestsByClass: async (classId) => {
+    try {
+        const response = await api.get(`/leave-request/classroom/${classId}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+  },
+
+  approveRequest: async (requestId) => {
+      try {
+          const response = await api.post(`/leave-request/${requestId}/approve`);
+          return response.data;
+      } catch (error) {
+          throw error;
+      }
+  },
+
+  rejectRequest: async (requestId, denialReason) => {
+      try {
+          const response = await api.post(`/leave-request/${requestId}/deny`, {
+              denialReason: denialReason
+          });
+          return response.data;
+      } catch (error) {
+          throw error;
+      }
+  },
+
+  getAllRequests: async () => {
+    try {
+        const response = await api.get('/leave-request/my-all');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
   }
 };

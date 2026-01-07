@@ -29,4 +29,33 @@ export const classroomService = {
       throw error;
     }
   },
+
+  // Instructor APIs
+  createClass: async (classData) => {
+    try {
+      const response = await api.post('/classroom/create', classData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getTeachedClasses: async () => {
+    try {
+      const response = await api.get('/classroom/my-teaching');
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getClassStudents: async (classId) => {
+    try {
+      const response = await api.get(`/classroom/${classId}/students`);
+      return response.data;
+    } catch (error) {
+       console.log("Error fetching students:", error);
+       throw error;
+    }
+  }
 };

@@ -43,7 +43,6 @@ export default function ProofModal({ visible, onClose, requestId, accessToken, s
                     {/* Header Info */}
                     <View style={styles.header}>
                         <Text style={styles.studentName}>{studentName}</Text>
-                        <Text style={styles.studentId}>2211832</Text>
 
                         {isPending && (
                             <View style={styles.headerButtons}>
