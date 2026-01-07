@@ -2,9 +2,19 @@ import React from 'react';
 import { View, Text, Modal, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GradientButton from './Button';
+import { API_URL } from '../config';
 
-export default function ProofModal({ visible, onClose, imageUrl, studentName, date, reason, status }) {
-    const displayImage = imageUrl ? { uri: imageUrl } : null;
+export default function ProofModal({ visible, onClose, requestId, accessToken, studentName, date, reason, status }) {
+    
+    const imageUrl = `${API_URL}/leave-request/evidence/${requestId}`;
+    
+    // Construct source object for Image component
+    const imageSource = {
+        uri: imageUrl,
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    };
 
     const getStatusStyle = (s) => {
         switch (s) {
@@ -55,20 +65,12 @@ export default function ProofModal({ visible, onClose, imageUrl, studentName, da
 
                     {/* Image Area */}
                     <View style={styles.imageContainer}>
-                        {displayImage ? (
-                            <Image source={displayImage} style={styles.image} resizeMode="contain" />
-                        ) : (
-                            <View style={styles.placeholder}>
-                                <Text style={{ color: '#999' }}>No Image</Text>
-                            </View>
-                        )}
-                    </View>
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.label}>Lý do: <Text style={styles.value}>{reason}</Text></Text>
-                    </View>
-                    <View style={styles.infoRow}>
-                        <Text style={styles.label}>Minh chứng: <Text style={styles.linkText}>Chi tiết</Text></Text>
+                         <Image 
+                            source={imageSource} 
+                            style={styles.image} 
+                            resizeMode="contain"
+                            onError={(e) => console.log('Image Load Error', e.nativeEvent.error)}
+                         />
                     </View>
 
                     {/* Bottom Status Button */}

@@ -22,4 +22,30 @@ export const requestService = {
       throw error;
     }
   },
+
+  getRequestEvidence: async (requestId) => {
+      try {
+          const response = await api.get(`/leave-request/evidence/${requestId}`, {
+              responseType: 'arraybuffer' // Important for images
+          });
+          // Convert to base64
+          const base64 = Buffer.from(response.data, 'binary').toString('base64');
+          
+          // Determine mime type if possible, or default to png/jpeg logic
+          // The API might return content-type header
+          const contentType = response.headers['content-type'] || 'image/jpeg';
+          return `data:${contentType};base64,${base64}`;
+      } catch (error) {
+          throw error;
+      }
+  },
+
+  deleteRequest: async (requestId) => {
+      try {
+          const response = await api.delete(`/leave-request/${requestId}`);
+          return response.data;
+      } catch (error) {
+          throw error;
+      }
+  }
 };

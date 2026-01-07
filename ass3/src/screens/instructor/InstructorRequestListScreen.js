@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import InstructorRequestCard from '../../components/InstructorRequestCard';
 import ProofModal from '../../components/ProofModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MOCK_ALL_REQUESTS = [
     { _id: '1', studentName: 'Nguyễn Văn A', studentId: '2211832', className: 'Quản lý dự án - CO3007', date: '22/11/2025', reason: 'Bị sốt', status: 'pending', proofImage: 'https://via.placeholder.com/300' },
@@ -16,6 +17,15 @@ export default function InstructorRequestListScreen({ navigation }) {
     const [activeFilter, setActiveFilter] = useState('all');
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedProof, setSelectedProof] = useState(null);
+    const [accessToken, setAccessToken] = useState(null);
+
+    useEffect(() => {
+        const getToken = async () => {
+            const token = await AsyncStorage.getItem('accessToken');
+            setAccessToken(token);
+        };
+        getToken();
+    }, []);
 
     const getFilteredData = () => {
         if (activeFilter === 'all') return MOCK_ALL_REQUESTS;
@@ -75,7 +85,8 @@ export default function InstructorRequestListScreen({ navigation }) {
                 <ProofModal
                     visible={modalVisible}
                     onClose={() => setModalVisible(false)}
-                    imageUrl={selectedProof.proofImage}
+                    requestId={selectedProof._id}
+                    accessToken={accessToken}
                     studentName={selectedProof.studentName}
                     date={selectedProof.date}
                     reason={selectedProof.reason}
