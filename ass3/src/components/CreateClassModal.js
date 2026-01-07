@@ -1,23 +1,37 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Modal, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GradientButton from './Button';
+import { classroomService } from '../services/classroomService';
 
-export default function CreateClassModal({ visible, onClose }) {
-    const [className, setClassName] = useState('');
-    const [classCode, setClassCode] = useState('');
+export default function CreateClassModal({ visible, onClose, onSuccess }) {
+    const [id, setId] = useState('');
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleCreate = () => {
-        if (!className.trim() || !classCode.trim()) {
+    const handleCreate = async () => {
+        if (!id.trim() || !name.trim() || !description.trim()) {
             Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
             return;
         }
 
-        Alert.alert('Thành công', `Đã tạo lớp ${className} (${classCode})`);
-
-        setClassName('');
-        setClassCode('');
-        onClose();
+        try {
+            setLoading(true);
+            await classroomService.createClass({ id, name, description });
+            Alert.alert('Thành công', `Đã tạo lớp ${name}`);
+            
+            setId('');
+            setName('');
+            setDescription('');
+            if (onSuccess) onSuccess();
+            onClose();
+        } catch (error) {
+            console.log('Create class error:', error);
+            Alert.alert('Lỗi', 'Không thể tạo lớp học. Vui lòng thử lại.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -33,30 +47,47 @@ export default function CreateClassModal({ visible, onClose }) {
                         <Ionicons name="close" size={20} color="#666" />
                     </TouchableOpacity>
 
-                    <Text style={styles.label}>Tên lớp học</Text>
+                    <Text style={styles.headerTitle}>Tạo Lớp Học Mới</Text>
+
+                    <Text style={styles.label}>Mã Lớp Học (ID)</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Text input"
-                        value={className}
-                        onChangeText={setClassName}
+                        placeholder="VD: L01"
+                        value={id}
+                        onChangeText={setId}
                         placeholderTextColor="#ccc"
                     />
 
-                    <Text style={styles.label}>Mã lớp học</Text>
+                    <Text style={styles.label}>Tên Lớp Học</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Text input"
-                        value={classCode}
-                        onChangeText={setClassCode}
+                        placeholder="VD: Mobile Pro"
+                        value={name}
+                        onChangeText={setName}
                         placeholderTextColor="#ccc"
+                    />
+
+                    <Text style={styles.label}>Mô Tả</Text>
+                     <TextInput
+                        style={[styles.input, styles.textArea]}
+                        placeholder="Mô tả lớp học..."
+                        value={description}
+                        onChangeText={setDescription}
+                        placeholderTextColor="#ccc"
+                        multiline={true}
+                        numberOfLines={3}
                     />
 
                     <View style={styles.buttonContainer}>
-                        <GradientButton
-                            title="Tạo lớp mới"
-                            onPress={handleCreate}
-                            style={styles.createBtn}
-                        />
+                        {loading ? (
+                            <ActivityIndicator size="large" color="#4285F4" />
+                        ) : (
+                            <GradientButton
+                                title="Tạo lớp mới"
+                                onPress={handleCreate}
+                                style={styles.createBtn}
+                            />
+                        )}
                     </View>
                 </View>
             </View>
@@ -97,6 +128,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'center',
+        marginBottom: 20,
+        fontFamily: 'Roboto',
+    },
     label: {
         fontWeight: 'bold',
         color: '#666',
@@ -112,6 +151,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         color: '#333',
         fontFamily: 'Roboto',
+    },
+    textArea: {
+        height: 80,
+        textAlignVertical: 'top',
     },
     buttonContainer: {
         marginTop: 20,

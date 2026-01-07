@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import InstructorRequestCard from '../../components/InstructorRequestCard';
 import ProofModal from '../../components/ProofModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const MOCK_ALL_REQUESTS = [
-    { _id: '1', studentName: 'Nguyễn Văn A', studentId: '2211832', className: 'Quản lý dự án - CO3007', date: '22/11/2025', reason: 'Bị sốt', status: 'pending', proofImage: 'https://via.placeholder.com/300' },
-    { _id: '2', studentName: 'Lê Thị B', studentId: '2211832', className: 'Mobile Dev - CO3007', date: '22/11/2025', reason: 'Việc gia đình', status: 'approved', proofImage: '' },
-    { _id: '3', studentName: 'Nguyễn Văn A', studentId: '2211832', className: 'Quản lý dự án - CO3007', date: '22/11/2025', reason: 'Xe hư', status: 'rejected', proofImage: '' },
-    { _id: '4', studentName: 'Trần C', studentId: '2211832', className: 'Mobile Dev - CO3007', date: '22/11/2025', reason: 'Đau bụng', status: 'pending', proofImage: '' },
-];
-
+import { requestService } from '../../services/requestService';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function InstructorRequestListScreen({ navigation }) {
     const [activeFilter, setActiveFilter] = useState('all');
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedProof, setSelectedProof] = useState(null);
     const [accessToken, setAccessToken] = useState(null);
+    
+    // Data State
+    const [allRequests, setAllRequests] = useState([]);
+    const [displayedRequests, setDisplayedRequests] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const getToken = async () => {
@@ -27,13 +26,70 @@ export default function InstructorRequestListScreen({ navigation }) {
         getToken();
     }, []);
 
-    const getFilteredData = () => {
-        if (activeFilter === 'all') return MOCK_ALL_REQUESTS;
-        return MOCK_ALL_REQUESTS.filter(r => r.status === activeFilter);
+    const fetchRequests = async () => {
+        setLoading(true);
+        try {
+            const data = await requestService.getAllRequests();
+            // Map data
+            const mapped = data.map(r => ({
+                _id: r.id,
+                studentName: r.studentName,
+                studentId: '', 
+                className: r.classroomName,
+                date: r.absenceDate,
+                reason: r.reason,
+                status: r.status ? r.status.toLowerCase() : 'pending',
+                proofImage: r.id, // ID for fetching proof
+            }));
+            setAllRequests(mapped);
+        } catch (error) {
+            console.log('Error fetching all requests:', error);
+            setAllRequests([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleApprove = (id) => { console.log('Approve', id); };
-    const handleReject = (id) => { console.log('Reject', id); };
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchRequests();
+        }, [])
+    );
+
+    useEffect(() => {
+        if (activeFilter === 'all') {
+            setDisplayedRequests(allRequests);
+        } else {
+            setDisplayedRequests(allRequests.filter(r => r.status === activeFilter));
+        }
+    }, [activeFilter, allRequests]);
+
+    const handleApprove = async (id) => {
+        try {
+            await requestService.approveRequest(id);
+            alert("Đã duyệt đơn");
+            fetchRequests();
+        } catch (error) {
+            console.log("Error approving:", error);
+            alert("Có lỗi xảy ra khi duyệt");
+        }
+    };
+
+    const handleReject = async (id) => {
+         try {
+             // Find request to get reason
+             const request = allRequests.find(r => r._id === id);
+             const denialReason = request ? request.reason : "Không có lý do cụ thể";
+             
+             await requestService.rejectRequest(id, denialReason);
+             alert("Đã từ chối đơn");
+             fetchRequests();
+         } catch (error) {
+             console.log("Error rejecting:", error);
+             const msg = error.response?.data?.message || error.message || "Có lỗi xảy ra";
+             alert(`Không thể từ chối đơn: ${msg}`);
+         }
+    };
 
     const handleOpenProof = (item) => {
         setSelectedProof(item);
@@ -66,19 +122,24 @@ export default function InstructorRequestListScreen({ navigation }) {
                 </View>
             </View>
 
-            <FlatList
-                data={getFilteredData()}
-                keyExtractor={item => item._id}
-                renderItem={({ item }) => (
-                    <InstructorRequestCard
-                        item={item}
-                        onApprove={handleApprove}
-                        onReject={handleReject}
-                        onPressProof={() => handleOpenProof(item)}
-                    />
-                )}
-                contentContainerStyle={styles.listContent}
-            />
+            {loading ? (
+                <ActivityIndicator size="large" color="#4285F4" style={{ marginTop: 20 }} />
+            ) : (
+                <FlatList
+                    data={displayedRequests}
+                    keyExtractor={item => item._id?.toString()}
+                    renderItem={({ item }) => (
+                        <InstructorRequestCard
+                            item={item}
+                            onApprove={handleApprove}
+                            onReject={handleReject}
+                            onPressProof={() => handleOpenProof(item)}
+                        />
+                    )}
+                    contentContainerStyle={styles.listContent}
+                    ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20, color: '#999' }}>Không có đơn nào.</Text>}
+                />
+            )}
 
             {/* Modal */}
             {selectedProof && (
