@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ass3",
-    "slug": "ass3",
+    "name": "ClassTrack",
+    "slug": "ClassTrack",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,6 +16,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.kienkaukinh.classtrack",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
