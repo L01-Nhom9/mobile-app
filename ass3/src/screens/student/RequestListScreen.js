@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Filter from '../../components/Filter';
 import FormList from '../../components/FormList';
 import { requestService } from '../../services/requestService';
+import ProofModal from '../../components/ProofModal';
 import { useFocusEffect } from '@react-navigation/native';
 
 const FILTERS = [
@@ -18,12 +19,18 @@ export default function RequestListScreen({ navigation, user, onLogout }) {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Proof Modal State
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [proofImage, setProofImage] = useState(null);
+    const [loadingProof, setLoadingProof] = useState(false);
+
     const fetchRequests = async () => {
         setLoading(true);
         try {
             const data = await requestService.getMyRequests();
             // Map API data to UI format
-            // API: { id, classroomName, absenceDate, status, reason, ... }
+            // API: { id, classroomName, absenceDate, status, reason, studentName, ... }
             const mappedData = data.map(item => ({
                 _id: typeof item.id === 'number' ? item.id.toString() : item.id,
                 className: item.classroomName,
@@ -31,6 +38,8 @@ export default function RequestListScreen({ navigation, user, onLogout }) {
                 date: item.absenceDate,
                 reason: item.reason || 'No reason provided',
                 status: item.status, // UPPERCASE from API
+                studentName: item.studentName, // Added studentName
+                // Don't map proofImage URL directly as we fetch it on demand
             }));
             
             // Sort by date descending (newest first)
@@ -54,6 +63,39 @@ export default function RequestListScreen({ navigation, user, onLogout }) {
         ? requests
         : requests.filter(req => req.status === activeFilter);
 
+    const handlePressProof = async (item) => {
+        setSelectedRequest(item);
+        setModalVisible(true);
+        // We use the image URL directly with headers now
+    };
+
+    const handleWithdraw = (requestId) => {
+        Alert.alert(
+            'Thu hồi yêu cầu',
+            'Bạn có chắc chắn muốn thu hồi (xóa) yêu cầu này không?',
+            [
+                { text: 'Hủy', style: 'cancel' },
+                { 
+                    text: 'Đồng ý', 
+                    style: 'destructive',
+                    onPress: async () => {
+                        setLoading(true); // Show loading/spinner locally if needed, or refresh list
+                        try {
+                            await requestService.deleteRequest(requestId);
+                            // Refresh list
+                            fetchRequests();
+                            Alert.alert('Thành công', 'Đã thu hồi yêu cầu.');
+                        } catch (error) {
+                            console.error('Withdraw error:', error);
+                            Alert.alert('Lỗi', 'Không thể thu hồi yêu cầu này.');
+                            setLoading(false);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -63,7 +105,8 @@ export default function RequestListScreen({ navigation, user, onLogout }) {
                 </TouchableOpacity>
             </View>
 
-            <Text style={styles.userInfo}>{user?.name || 'Student Name'}</Text>
+            {/* Use studentName from the first request if available, otherwise user.name */}
+            <Text style={styles.userInfo}>{requests[0]?.studentName || user?.name || 'Student Name'}</Text>
             <Text style={styles.screenTitle}>DANH SÁCH ĐƠN</Text>
 
             <View style={styles.statsRow}>
@@ -80,7 +123,25 @@ export default function RequestListScreen({ navigation, user, onLogout }) {
             {loading ? (
                 <ActivityIndicator size="large" color="#93C5FD" style={{ marginTop: 20 }} />
             ) : (
-                <FormList data={filteredRequests} />
+                <FormList 
+                    data={filteredRequests} 
+                    onPressProof={handlePressProof}
+                    onWithdraw={handleWithdraw}
+                />
+            )}
+
+            {/* Proof Modal */}
+            {selectedRequest && (
+                <ProofModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    requestId={selectedRequest._id}
+                    accessToken={user?.accessToken}
+                    studentName={selectedRequest.studentName}
+                    date={selectedRequest.date}
+                    reason={selectedRequest.reason}
+                    status={selectedRequest.status}
+                />
             )}
         </View>
     );

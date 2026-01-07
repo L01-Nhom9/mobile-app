@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 
-const FormList = ({ data }) => {
+const FormList = ({ data, onPressProof, onWithdraw }) => {
 
     const getStatusColor = (status) => {
         const s = status ? status.toLowerCase() : '';
@@ -27,15 +27,35 @@ const FormList = ({ data }) => {
         const style = getStatusColor(item.status);
         return (
             <View style={styles.card}>
-                <Text style={styles.className}>{item.className}</Text>
-                <Text style={styles.classCode}>{item.code}</Text>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <View>
+                        <Text style={styles.className}>{item.className}</Text>
+                        <Text style={styles.classCode}>{item.code}</Text>
+                    </View>
+                </View>
                 <View style={styles.divider} />
 
                 <Text style={styles.infoLine}><Text style={styles.label}>Ngày:</Text> {item.date}</Text>
                 <Text style={styles.infoLine}><Text style={styles.label}>Lý do:</Text> {item.reason}</Text>
-                <Text style={[styles.infoLine, { textDecorationLine: 'underline', color: '#666' }]}>
-                    Minh chứng: Chi tiết
-                </Text>
+                
+                <View style={{flexDirection: 'row', marginTop: 5, marginBottom: 5}}>
+                   <Text style={[styles.label, {marginRight: 5}]}>Minh chứng:</Text>
+                   <Text 
+                        style={[styles.infoLine, { textDecorationLine: 'underline', color: '#3B82F6' }]}
+                        onPress={() => onPressProof && onPressProof(item)}
+                   >
+                        Chạm vào để xem minh chứng
+                    </Text>
+                </View>
+
+                {(item.status === 'PENDING' || item.status === 'pending') && (
+                    <TouchableOpacity 
+                        style={styles.withdrawButton}
+                        onPress={() => onWithdraw && onWithdraw(item._id)}
+                    >
+                        <Text style={styles.withdrawText}>Thu hồi</Text>
+                    </TouchableOpacity>
+                )}
 
                 <View style={styles.statusContainer}>
                     <View style={[styles.statusBadge, { borderColor: style.borderColor, backgroundColor: style.bg }]}>
@@ -116,6 +136,20 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontFamily: 'Roboto',
         textTransform: 'uppercase',
+    },
+    withdrawButton: {
+        marginTop: 10,
+        alignSelf: 'flex-start',
+        borderWidth: 1,
+        borderColor: '#EF4444',
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+    },
+    withdrawText: {
+        color: '#EF4444',
+        fontSize: 12,
+        fontWeight: 'bold',
     }
 });
 

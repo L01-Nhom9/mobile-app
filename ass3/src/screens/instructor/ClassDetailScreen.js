@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import InstructorRequestCard from '../../components/InstructorRequestCard';
 import ProofModal from '../../components/ProofModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Mock Data
 const MOCK_REQUESTS = [
@@ -18,6 +19,15 @@ export default function ClassDetailScreen({ route, navigation }) {
     const [activeFilter, setActiveFilter] = useState('pending');
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedProof, setSelectedProof] = useState(null);
+    const [accessToken, setAccessToken] = useState(null);
+
+    useEffect(() => {
+        const getToken = async () => {
+            const token = await AsyncStorage.getItem('accessToken');
+            setAccessToken(token);
+        };
+        getToken();
+    }, []);
 
     const getFilteredData = () => {
         return MOCK_REQUESTS.filter(r => r.status === activeFilter);
@@ -98,7 +108,8 @@ export default function ClassDetailScreen({ route, navigation }) {
                 <ProofModal
                     visible={modalVisible}
                     onClose={() => setModalVisible(false)}
-                    imageUrl={selectedProof.proofImage}
+                    requestId={selectedProof._id}
+                    accessToken={accessToken}
                     studentName={selectedProof.studentName}
                     date={selectedProof.date}
                     reason={selectedProof.reason}
