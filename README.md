@@ -2,7 +2,7 @@
 
 <br />
 <div align="center">
-  <img src="./images/logo_BK.png" alt="ClassTrack Logo" width="120">
+  <img src="./images/logo_BK.png" alt="ClassTrack Logo" alt="Logo" width="30%" height="30%>
   <h2 align="center">CLASS TRACK – Smart Attendance & Absence Management</h2>
   <p align="center">
     Ứng dụng quản lý điểm danh và đơn xin nghỉ học thông minh cho sinh viên và giảng viên.
@@ -76,27 +76,18 @@ Trong môi trường học tập hiện đại, việc quản lý điểm danh v
 
 ---
 
-## 🖥️ KIẾN TRÚC HỆ THỐNG
-
-- **Frontend (Mobile):** Giao diện cho sinh viên & giảng viên.
-- **Backend:** Xử lý logic, xác thực, phân quyền, duyệt đơn.
-- **Realtime:** Cập nhật trạng thái đơn theo thời gian thực.
-- **Database:** Lưu trữ người dùng, lớp học, đơn xin nghỉ, lịch sử xử lý.
-
----
-
 ## 🚀 CÔNG NGHỆ SỬ DỤNG
 
 - 📱 **Mobile App:** Flutter / React Native
 - 🌐 **Web Landing Page:** HTML, CSS, JavaScript
-- ⚙️ **Backend:** Node.js / Spring Boot
+- ⚙️ **Backend:** Java Spring Boot
 - 🔐 **Authentication:** JWT
-- 💾 **Database:** MySQL / PostgreSQL
-- ☁️ **Deployment:** Firebase / Vercel / Render
+- 💾 **Database:** PostgreSQL
+- ☁️ **Deployment:** Render
 
 ---
 
-## 📱 HƯỚNG DẪN SỬ DỤNG
+## 📱 CÁC MVP CHÍNH
 
 ### 1. Đăng nhập & đăng ký
 
@@ -139,7 +130,7 @@ Trong môi trường học tập hiện đại, việc quản lý điểm danh v
 Nếu bạn có bất kỳ thắc mắc, góp ý hoặc muốn hợp tác:
 
 📧 Email: **support@classtrack.com**  
-🌐 Website: **ClassTrack Landing Page**  
+🌐 Website: https://l01-nhom9.github.io/mobile-app/
 📱 App: Quét QR trên website để tải APK
 
 <p align="right"><a href="#readme-top">⬆️ Về đầu trang</a></p>
