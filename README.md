@@ -2,7 +2,7 @@
 
 <br />
 <div align="center">
-  <img src="./images/logo_BK.png" alt="ClassTrack Logo" alt="Logo" width="30%" height="30%>
+  <img src="./images/logo_BK.png" alt="ClassTrack Logo" alt="Logo" width="25%" height="25%>
   <h2 align="center">CLASS TRACK – Smart Attendance & Absence Management</h2>
   <p align="center">
     Ứng dụng quản lý điểm danh và đơn xin nghỉ học thông minh cho sinh viên và giảng viên.
@@ -22,7 +22,7 @@
 - **Tên dự án:** `ClassTrack – Smart Attendance & Absence Management`
 - **Mục tiêu:** Xây dựng hệ thống quản lý lớp học, điểm danh và xử lý đơn xin nghỉ học theo thời gian thực.
 - **Đối tượng sử dụng:** Sinh viên & Giảng viên
-- **Nền tảng:** Mobile App + Landing Page Web
+- **Nền tảng:** Android - IOS
 
 ---
 
