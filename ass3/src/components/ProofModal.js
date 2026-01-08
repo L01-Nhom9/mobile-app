@@ -1,10 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GradientButton from './Button';
+import { API_URL } from '../config';
+import { requestService } from '../services/requestService';
 
-export default function ProofModal({ visible, onClose, imageUrl, studentName, date, reason, status }) {
-    const displayImage = imageUrl ? { uri: imageUrl } : null;
+export default function ProofModal({ visible, onClose, requestId, accessToken, studentName, date, reason, status }) {
+    
+    const [imageUri, setImageUri] = useState(null);
+    const [loadingImage, setLoadingImage] = useState(false);
+    const [isFullScreen, setIsFullScreen] = React.useState(false);
+
+    useEffect(() => {
+        if (visible && requestId) {
+            fetchImage();
+        } else {
+            setImageUri(null);
+        }
+    }, [visible, requestId]);
+
+    const fetchImage = async () => {
+        setLoadingImage(true);
+        try {
+            const base64Img = await requestService.getRequestEvidence(requestId);
+            setImageUri(base64Img);
+        } catch (error) {
+            console.log("Error fetching proof image:", error);
+            setImageUri(null);
+        } finally {
+            setLoadingImage(false);
+        }
+    };
 
     const getStatusStyle = (s) => {
         switch (s) {
@@ -33,7 +59,6 @@ export default function ProofModal({ visible, onClose, imageUrl, studentName, da
                     {/* Header Info */}
                     <View style={styles.header}>
                         <Text style={styles.studentName}>{studentName}</Text>
-                        <Text style={styles.studentId}>2211832</Text>
 
                         {isPending && (
                             <View style={styles.headerButtons}>
@@ -55,20 +80,24 @@ export default function ProofModal({ visible, onClose, imageUrl, studentName, da
 
                     {/* Image Area */}
                     <View style={styles.imageContainer}>
-                        {displayImage ? (
-                            <Image source={displayImage} style={styles.image} resizeMode="contain" />
+                        {loadingImage ? (
+                            <ActivityIndicator size="large" color="#93C5FD" style={{ marginTop: 80 }} />
                         ) : (
-                            <View style={styles.placeholder}>
-                                <Text style={{ color: '#999' }}>No Image</Text>
-                            </View>
+                            imageUri ? (
+                                <TouchableOpacity onPress={() => setIsFullScreen(true)}>
+                                    <Image 
+                                        source={{ uri: imageUri }}
+                                        style={styles.image} 
+                                        resizeMode="contain"
+                                        onError={(e) => console.log('Image Load Error', e.nativeEvent.error)}
+                                    />
+                                </TouchableOpacity>
+                            ) : (
+                                <View style={styles.placeholder}>
+                                    <Text style={{color: '#999'}}>Không có ảnh hoặc lỗi tải ảnh</Text>
+                                </View>
+                            )
                         )}
-                    </View>
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.label}>Lý do: <Text style={styles.value}>{reason}</Text></Text>
-                    </View>
-                    <View style={styles.infoRow}>
-                        <Text style={styles.label}>Minh chứng: <Text style={styles.linkText}>Chi tiết</Text></Text>
                     </View>
 
                     {/* Bottom Status Button */}
@@ -81,6 +110,26 @@ export default function ProofModal({ visible, onClose, imageUrl, studentName, da
                     )}
                 </View>
             </View>
+
+            {/* Full Screen Image Modal */}
+            <Modal
+                visible={isFullScreen}
+                transparent={true}
+                onRequestClose={() => setIsFullScreen(false)}
+            >
+                <View style={styles.fullScreenContainer}>
+                    <TouchableOpacity style={styles.closeFullScreenButton} onPress={() => setIsFullScreen(false)}>
+                         <Ionicons name="close" size={30} color="white" />
+                    </TouchableOpacity>
+                    {imageUri && (
+                        <Image
+                            source={{ uri: imageUri }}
+                            style={styles.fullScreenImage}
+                            resizeMode="contain"
+                        />
+                    )}
+                </View>
+            </Modal>
         </Modal>
     );
 }
@@ -190,5 +239,24 @@ const styles = StyleSheet.create({
     statusText: {
         color: '#22C55E', // Green text for approved
         fontWeight: 'bold',
+    },
+    fullScreenContainer: {
+        flex: 1,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    fullScreenImage: {
+        width: '100%',
+        height: '100%',
+    },
+    closeFullScreenButton: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+        zIndex: 1,
+        padding: 10,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: 20,
     }
 });

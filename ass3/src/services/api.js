@@ -1,16 +1,30 @@
 import axios from 'axios';
-import { Platform } from 'react-native';
-
-// For Android Emulator use 10.0.2.2. For Physical Device use your machine's IP.
-// const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
-// Replace with your actual local IP if testing on device!
-const BASE_URL = 'http://10.0.2.2:5000/api'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../config';
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Add a request interceptor to add the auth token
+api.interceptors.request.use(
+  async (config) => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error('Error attaching token', error);
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default api;

@@ -6,21 +6,63 @@ import GradientButton from '../../components/Button';
 import ClassList from '../../components/ClassList';
 import CreateClassModal from '../../components/CreateClassModal';
 
-const MOCK_CLASSES = [
-  { _id: '1', name: 'Quản lý dự án', code: 'CO3007', instructor: 'TRẦN VĂN HOÀI', color: '#93C5FD' },
-  { _id: '2', name: 'Đánh giá Hiệu năng Hệ thống', code: 'CO3007', instructor: 'BÙI XUÂN GIANG', color: '#C084FC' },
-  { _id: '3', name: 'Phát triển ứng dụng thiết bị di động', code: 'CO3007', instructor: 'HOÀNG LÊ HẢI THANH', color: '#FCD34D' },
-];
+import { classroomService } from '../../services/classroomService';
+import { useFocusEffect } from '@react-navigation/native';
 
-export default function InstructorHomeScreen({ navigation, user, onLogout }) {
+export default function InstructorHomeScreen({ navigation, route, user, onLogout }) {
   const [searchText, setSearchText] = useState('');
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const filteredClasses = MOCK_CLASSES.filter(item => {
+  // Check for param to open modal
+  React.useEffect(() => {
+    if (route.params?.openCreateModal) {
+      setCreateModalVisible(true);
+      // Clear param to prevent reopening on subsequent focus if logic changes,
+      // though navigation.navigate usually passes same params unless changed.
+      // Better to clear it.
+      navigation.setParams({ openCreateModal: undefined });
+    }
+  }, [route.params?.openCreateModal]);
+
+  const fetchClasses = async () => {
+    try {
+        setLoading(true);
+        const data = await classroomService.getTeachedClasses();
+        // Map API data to UI format
+        const mappedData = data.map(item => ({
+            _id: item.id,
+            name: item.name,
+            code: item.joinCode, // Assuming joinCode is the Class Code to display
+            instructor: item.instructor,
+            color: getRandomColor(), // Helper for UI
+            ...item
+        }));
+        setClasses(mappedData);
+    } catch (error) {
+        console.log('Error fetching classes:', error);
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchClasses();
+    }, [])
+  );
+
+  const getRandomColor = () => {
+      const colors = ['#93C5FD', '#C084FC', '#FCD34D', '#34D399', '#F87171'];
+      return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  const filteredClasses = classes.filter(item => {
     const searchLower = searchText.toLowerCase();
     return (
       item.name.toLowerCase().includes(searchLower) ||
-      item.code.toLowerCase().includes(searchLower)
+      (item.code && item.code.toLowerCase().includes(searchLower))
     );
   });
 
@@ -61,7 +103,15 @@ export default function InstructorHomeScreen({ navigation, user, onLogout }) {
         searchText={searchText}
         onPressItem={(item) => navigation.navigate('ClassDetail', { classData: item })}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No classes found matching "{searchText}"</Text>
+          <Text style={styles.emptyText}>
+            {loading 
+              ? "Đang tải..." 
+              : (classes.length === 0 
+                  ? "Bạn chưa có lớp học nào" 
+                  : `Không tìm thấy lớp học nào khớp với "${searchText}"`)
+            }
+          </Text>
+
         }
       />
 
@@ -69,6 +119,7 @@ export default function InstructorHomeScreen({ navigation, user, onLogout }) {
       <CreateClassModal
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
+        onSuccess={fetchClasses}
       />
     </View>
   );

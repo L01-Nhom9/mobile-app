@@ -1,10 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const ClassList = ({ data, onPressItem, ListEmptyComponent, searchText }) => {
-    const ITEMS_PER_PAGE = 5;
+const ClassList = ({ data, onPressItem, onLeave, ListEmptyComponent, searchText, itemsPerPage = 3 }) => {
+    const [currentPage, setCurrentPage] = useState(1);
+    
+    // Reset to page 1 when search changes or data changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchText, data.length]);
+
+    const onPageChange = (page) => {
+        setCurrentPage(page);
+    };
+
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    
+    // Get current items
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 
     const renderItem = ({ item }) => (
         <TouchableOpacity
@@ -17,15 +33,62 @@ const ClassList = ({ data, onPressItem, ListEmptyComponent, searchText }) => {
                     <Text style={styles.classDetails}>({item.code})_{item.instructor}</Text>
                     <View style={[styles.progressBar, { backgroundColor: item.color }]} />
                 </View>
+                {onLeave && (
+                    <TouchableOpacity onPress={() => onLeave(item)} style={styles.leaveBtn}>
+                        <Ionicons name="log-out-outline" size={24} color="#EF4444" />
+                    </TouchableOpacity>
+                )}
                 <Ionicons name="chevron-forward" size={24} color="#93C5FD" />
             </View>
         </TouchableOpacity>
     );
 
+    const renderPagination = () => {
+        if (totalPages <= 1) return null;
+
+        return (
+            <View style={styles.pagination}>
+                <TouchableOpacity 
+                    style={styles.pageArrow} 
+                    onPress={() => onPageChange(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                >
+                    <Ionicons name="chevron-back" size={20} color={currentPage === 1 ? "#ccc" : "#000"} />
+                </TouchableOpacity>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <TouchableOpacity
+                        key={page}
+                        onPress={() => onPageChange(page)}
+                    >
+                         {currentPage === page ? (
+                            <LinearGradient
+                                colors={['#93C5FD', '#F9A8D4']}
+                                style={styles.activePage}
+                            >
+                                <Text style={styles.activePageText}>{page}</Text>
+                            </LinearGradient>
+                        ) : (
+                            <Text style={styles.pageNumber}>{page}</Text>
+                        )}
+                    </TouchableOpacity>
+                ))}
+
+                <TouchableOpacity 
+                    style={styles.pageArrow}
+                    onPress={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                >
+                    <Ionicons name="chevron-forward" size={20} color={currentPage === totalPages ? "#ccc" : "#000"} />
+                </TouchableOpacity>
+            </View>
+        );
+    };
+
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={data}
+                data={currentItems}
                 renderItem={renderItem}
                 keyExtractor={item => item._id}
                 contentContainerStyle={styles.listContent}
@@ -33,25 +96,7 @@ const ClassList = ({ data, onPressItem, ListEmptyComponent, searchText }) => {
                 ListEmptyComponent={ListEmptyComponent}
             />
 
-            {/* Pagination (Conditional - kept simple for now) */}
-            {data.length > ITEMS_PER_PAGE && (
-                <View style={styles.pagination}>
-                    <TouchableOpacity style={styles.pageArrow}>
-                        <Ionicons name="chevron-back" size={20} color="#999" />
-                    </TouchableOpacity>
-                    <Text style={styles.pageNumber}>1</Text>
-                    <LinearGradient
-                        colors={['#93C5FD', '#F9A8D4']}
-                        style={styles.activePage}
-                    >
-                        <Text style={styles.activePageText}>2</Text>
-                    </LinearGradient>
-                    <Text style={styles.pageNumber}>3</Text>
-                    <TouchableOpacity style={styles.pageArrow}>
-                        <Ionicons name="chevron-forward" size={20} color="#999" />
-                    </TouchableOpacity>
-                </View>
-            )}
+            {renderPagination()}
         </View>
     );
 };
@@ -79,6 +124,10 @@ const styles = StyleSheet.create({
     cardInfo: {
         flex: 1,
         marginRight: 10,
+    },
+    leaveBtn: {
+        padding: 5,
+        marginRight: 5,
     },
     className: {
         fontSize: 16,

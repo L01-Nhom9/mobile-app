@@ -1,21 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GradientButton from '../../components/Button';
+import { classroomService } from '../../services/classroomService';
 
 export default function JoinClassScreen({ navigation }) {
     const [classId, setClassId] = useState('');
 
-    const handleJoin = () => {
+    const [loading, setLoading] = useState(false);
+
+    const handleJoin = async () => {
         if (!classId.trim()) {
             Alert.alert('Lỗi', 'Vui lòng nhập ID lớp học');
             return;
         }
 
-        // Mock success - in real app would call API
-        Alert.alert('Thành công', `Đã gửi yêu cầu tham gia lớp ${classId}`, [
-            { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
+        setLoading(true);
+        try {
+            await classroomService.joinClass(classId.trim());
+            Alert.alert('Thành công', `Đã tham gia lớp thành công!`, [
+                { text: 'OK', onPress: () => navigation.goBack() }
+            ]);
+        } catch (error) {
+           console.log('Join Error:', error);
+           let msg = 'Không thể tham gia lớp. Vui lòng kiểm tra lại mã.';
+           if (error.response) {
+               msg += `\nStatus: ${error.response.status}`;
+               if (error.response.data && typeof error.response.data === 'object') {
+                   msg += `\nMsg: ${JSON.stringify(error.response.data)}`;
+               } else {
+                   msg += `\nData: ${error.response.data}`;
+               }
+           } else {
+               msg += `\nError: ${error.message}`;
+           }
+           Alert.alert('Lỗi', msg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -28,20 +50,25 @@ export default function JoinClassScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
 
-                <Text style={styles.label}>ID lớp học</Text>
+                <Text style={styles.label}>Mã tham gia</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="ID"
+                    placeholder="Nhập mã lớp..."
                     value={classId}
                     onChangeText={setClassId}
                     placeholderTextColor="#999"
+                    autoCapitalize="characters"
                 />
 
-                <GradientButton
-                    title="Tham gia"
-                    onPress={handleJoin}
-                    style={styles.submitContainer}
-                />
+                {loading ? (
+                    <ActivityIndicator size="large" color="#93C5FD" />
+                ) : (
+                    <GradientButton
+                        title="Tham gia"
+                        onPress={handleJoin}
+                        style={styles.submitContainer}
+                    />
+                )}
 
             </View>
         </View>

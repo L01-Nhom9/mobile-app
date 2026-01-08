@@ -41,6 +41,3 @@ yarn-error.*
 /ios
 /android
 
-# user requested ignores
-package-lock.json
-package.json
