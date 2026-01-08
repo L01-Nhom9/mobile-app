@@ -1,24 +1,79 @@
-# Skilline Landing Page
-Free landing page template built on top of TailwindCSS
+<a id="readme-top"></a>
 
-> [LIVE DEMO](https://mhaecal.github.io/frontend/skilline)
+<br />
+<div align="center">
+  <img src="./images/logo.png" alt="ClassTrack Logo" width="120">
+  <h2 align="center">CLASS TRACK – Smart Attendance & Absence Management</h2>
+  <p align="center">
+    Ứng dụng quản lý điểm danh và đơn xin nghỉ học thông minh cho sinh viên và giảng viên.
+    <br />
+    <a href="#">View Demo</a>
+    ·
+    <a href="#">Report Bug</a>
+    ·
+    <a href="#">Request Feature</a>
+  </p>
+</div>
 
-![alt Free Tailwind Landing Page Template](https://i.postimg.cc/q7xRmNVp/FB-IMG-16158730841972067.jpg)
+---
 
-## Built with:
-- Tailwind CSS ^2.0
-- Alpine JS ^2.*
-- AOS - Animate on scroll library
+## 📌 Thông tin nhóm
 
-## Getting Started
-The template is just a HTML file using a CDN service
+- **Tên dự án:** `ClassTrack – Smart Attendance & Absence Management`
+- **Mục tiêu:** Xây dựng hệ thống quản lý lớp học, điểm danh và xử lý đơn xin nghỉ học theo thời gian thực.
+- **Đối tượng sử dụng:** Sinh viên & Giảng viên
+- **Nền tảng:** Mobile App + Landing Page Web
 
-`git clone https://github.com/mhaecal/skilline-landing-page.git`
+---
 
-#
-Use it for learn, but please don’t republish, redistribute, or resell the template.
+## 📖 GIỚI THIỆU DỰ ÁN
 
-For personal or commersial project, just contact [Irvan Moses](https://www.facebook.com/irvan.moses)
+### 🔹 Bối cảnh
 
-- Code by mhaecal
-- UI/UX by irvanmoses
+Trong môi trường học tập hiện đại, việc quản lý điểm danh và xử lý đơn xin nghỉ học vẫn còn phụ thuộc nhiều vào các phương thức thủ công như giấy tờ, email hoặc tin nhắn rời rạc. Điều này gây mất thời gian, thiếu minh bạch và khó kiểm soát lịch sử xử lý.
+
+**ClassTrack** được xây dựng nhằm số hóa toàn bộ quy trình này, giúp:
+
+- Sinh viên gửi đơn xin nghỉ nhanh chóng.
+- Giảng viên duyệt đơn tập trung, minh bạch.
+- Nhà trường dễ dàng theo dõi và tổng hợp dữ liệu.
+
+---
+
+### 🎯 Mục tiêu
+
+- Chuẩn hóa quy trình xin nghỉ học.
+- Tăng tính minh bạch trong việc duyệt đơn.
+- Giảm khối lượng công việc hành chính cho giảng viên.
+- Nâng cao trải nghiệm người dùng trên nền tảng di động.
+
+---
+
+## 🌟 TÍNH NĂNG CHÍNH
+
+### 👩‍🎓 Dành cho Sinh viên
+
+- 🔐 Đăng ký / đăng nhập tài khoản.
+- 🏫 Tham gia lớp học bằng mã lớp.
+- 📝 Tạo đơn xin nghỉ học:
+  - Chọn lý do nghỉ.
+  - Chọn ngày nghỉ.
+  - Đính kèm minh chứng (ảnh, file).
+- 📊 Theo dõi trạng thái đơn:
+  - Chờ duyệt
+  - Đã duyệt
+  - Từ chối
+
+---
+
+### 👨‍🏫 Dành cho Giảng viên
+
+- 📚 Quản lý danh sách lớp học.
+- 🧾 Xem danh sách đơn xin nghỉ trong từng lớp.
+- ✅ Duyệt / ❌ Từ chối đơn.
+- 👥 Xem danh sách sinh viên trong lớp.
+- 📥 Xuất báo cáo điểm danh theo thời gian (.csv).
+
+---
+
+## 🖥️ KIẾN TRÚC HỆ THỐNG
