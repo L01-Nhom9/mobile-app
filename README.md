@@ -123,7 +123,7 @@ Trong môi trường học tập hiện đại, việc quản lý điểm danh v
 
 Nếu bạn có bất kỳ thắc mắc, góp ý hoặc muốn hợp tác:
 
-📧 Email: **support@classtrack.com**  
+📧 Email: thinh.lam220304@hcmut.edu.vn
 🌐 Website: https://l01-nhom9.github.io/mobile-app/
 📱 App: Quét QR trên website để tải APK
 
