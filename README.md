@@ -2,7 +2,7 @@
 
 <br />
 <div align="center">
-  <img src="./images/logo_BK.png" alt="ClassTrack Logo" width="150">
+  <img src="./images/logo_BK.png" alt="ClassTrack Logo" width="300">
   <h2 align="center">CLASS TRACK – Smart Attendance & Absence Management</h2>
   <p align="center">
     Ứng dụng quản lý điểm danh và đơn xin nghỉ học thông minh cho sinh viên và giảng viên.
