@@ -103,7 +103,15 @@ export default function InstructorHomeScreen({ navigation, route, user, onLogout
         searchText={searchText}
         onPressItem={(item) => navigation.navigate('ClassDetail', { classData: item })}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>{loading ? 'Loading...' : `No classes found matching "${searchText}"`}</Text>
+          <Text style={styles.emptyText}>
+            {loading 
+              ? "Đang tải..." 
+              : (classes.length === 0 
+                  ? "Bạn chưa có lớp học nào" 
+                  : `Không tìm thấy lớp học nào khớp với "${searchText}"`)
+            }
+          </Text>
+
         }
       />
 

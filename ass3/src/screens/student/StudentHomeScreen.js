@@ -119,7 +119,8 @@ export default function StudentHomeScreen({ navigation, onLogout }) {
           onLeave={handleLeaveClass}
           ListEmptyComponent={
             <Text style={styles.emptyText}>
-              {classes.length === 0 ? "You haven't joined any classes yet." : `No classes found matching "${searchText}"`}
+              {classes.length === 0 ? "Chưa có lớp học nào" : `Không tìm thấy lớp học nào khớp với "${searchText}"`}
+
             </Text>
           }
         />

@@ -16,6 +16,8 @@ export default function ProofModal({ visible, onClose, requestId, accessToken, s
         }
     };
 
+    const [isFullScreen, setIsFullScreen] = React.useState(false);
+
     const getStatusStyle = (s) => {
         switch (s) {
             case 'approved': return { color: '#22C55E', borderColor: '#22C55E', text: 'ĐÃ DUYỆT' };
@@ -64,12 +66,14 @@ export default function ProofModal({ visible, onClose, requestId, accessToken, s
 
                     {/* Image Area */}
                     <View style={styles.imageContainer}>
-                         <Image 
-                            source={imageSource} 
-                            style={styles.image} 
-                            resizeMode="contain"
-                            onError={(e) => console.log('Image Load Error', e.nativeEvent.error)}
-                         />
+                         <TouchableOpacity onPress={() => setIsFullScreen(true)}>
+                             <Image 
+                                source={imageSource} 
+                                style={styles.image} 
+                                resizeMode="contain"
+                                onError={(e) => console.log('Image Load Error', e.nativeEvent.error)}
+                             />
+                         </TouchableOpacity>
                     </View>
 
                     {/* Bottom Status Button */}
@@ -82,6 +86,24 @@ export default function ProofModal({ visible, onClose, requestId, accessToken, s
                     )}
                 </View>
             </View>
+
+            {/* Full Screen Image Modal */}
+            <Modal
+                visible={isFullScreen}
+                transparent={true}
+                onRequestClose={() => setIsFullScreen(false)}
+            >
+                <View style={styles.fullScreenContainer}>
+                    <TouchableOpacity style={styles.closeFullScreenButton} onPress={() => setIsFullScreen(false)}>
+                         <Ionicons name="close" size={30} color="white" />
+                    </TouchableOpacity>
+                    <Image
+                        source={imageSource}
+                        style={styles.fullScreenImage}
+                        resizeMode="contain"
+                    />
+                </View>
+            </Modal>
         </Modal>
     );
 }
@@ -191,5 +213,24 @@ const styles = StyleSheet.create({
     statusText: {
         color: '#22C55E', // Green text for approved
         fontWeight: 'bold',
+    },
+    fullScreenContainer: {
+        flex: 1,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    fullScreenImage: {
+        width: '100%',
+        height: '100%',
+    },
+    closeFullScreenButton: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+        zIndex: 1,
+        padding: 10,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: 20,
     }
 });
