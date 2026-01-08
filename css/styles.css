@@ -4751,3 +4751,9 @@ img.u-pull-left {
 .footer-right {
   text-align: center;
 }
+
+.desc.lead {
+  font-weight: 400;
+  color: #aaaaaa;
+  line-height: 1.6;
+}
