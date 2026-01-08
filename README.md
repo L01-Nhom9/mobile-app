@@ -2,7 +2,7 @@
 
 <br />
 <div align="center">
-  <img src="./images/logo.png" alt="ClassTrack Logo" width="120">
+  <img src="./images/logo_BK.png" alt="ClassTrack Logo" width="120">
   <h2 align="center">CLASS TRACK – Smart Attendance & Absence Management</h2>
   <p align="center">
     Ứng dụng quản lý điểm danh và đơn xin nghỉ học thông minh cho sinh viên và giảng viên.
@@ -77,3 +77,71 @@ Trong môi trường học tập hiện đại, việc quản lý điểm danh v
 ---
 
 ## 🖥️ KIẾN TRÚC HỆ THỐNG
+
+- **Frontend (Mobile):** Giao diện cho sinh viên & giảng viên.
+- **Backend:** Xử lý logic, xác thực, phân quyền, duyệt đơn.
+- **Realtime:** Cập nhật trạng thái đơn theo thời gian thực.
+- **Database:** Lưu trữ người dùng, lớp học, đơn xin nghỉ, lịch sử xử lý.
+
+---
+
+## 🚀 CÔNG NGHỆ SỬ DỤNG
+
+- 📱 **Mobile App:** Flutter / React Native
+- 🌐 **Web Landing Page:** HTML, CSS, JavaScript
+- ⚙️ **Backend:** Node.js / Spring Boot
+- 🔐 **Authentication:** JWT
+- 💾 **Database:** MySQL / PostgreSQL
+- ☁️ **Deployment:** Firebase / Vercel / Render
+
+---
+
+## 📱 HƯỚNG DẪN SỬ DỤNG
+
+### 1. Đăng nhập & đăng ký
+
+- Người dùng tạo tài khoản mới hoặc đăng nhập hệ thống.
+
+### 2. Tham gia lớp học
+
+- Sinh viên nhập **mã lớp** để tham gia lớp.
+
+### 3. Tạo đơn xin nghỉ
+
+- Chọn lớp → Tạo đơn → Điền lý do → Đính kèm minh chứng → Gửi đơn.
+
+### 4. Giảng viên xử lý đơn
+
+- Truy cập lớp → Xem danh sách đơn → Duyệt / Từ chối.
+
+### 5. Xuất báo cáo
+
+- Chọn khoảng thời gian → Xuất file `.csv`.
+
+---
+
+---
+
+## 📌 ROADMAP PHÁT TRIỂN
+
+- [x] Đăng nhập / đăng ký
+- [x] Quản lý lớp học
+- [x] Tạo & duyệt đơn xin nghỉ
+- [x] Xuất báo cáo CSV
+- [ ] Thống kê điểm danh theo biểu đồ
+- [ ] Thông báo đẩy (Push Notification)
+- [ ] Tích hợp LMS
+
+---
+
+## 📬 LIÊN HỆ
+
+Nếu bạn có bất kỳ thắc mắc, góp ý hoặc muốn hợp tác:
+
+📧 Email: **support@classtrack.com**  
+🌐 Website: **ClassTrack Landing Page**  
+📱 App: Quét QR trên website để tải APK
+
+<p align="right"><a href="#readme-top">⬆️ Về đầu trang</a></p>
+
+> _README sẽ được cập nhật khi hệ thống có thêm tính năng mới._
