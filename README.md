@@ -6,12 +6,6 @@
   <h2 align="center">CLASS TRACK – Smart Attendance & Absence Management</h2>
   <p align="center">
     Ứng dụng quản lý điểm danh và đơn xin nghỉ học thông minh cho sinh viên và giảng viên.
-    <br />
-    <a href="#">View Demo</a>
-    ·
-    <a href="#">Report Bug</a>
-    ·
-    <a href="#">Request Feature</a>
   </p>
 </div>
 
