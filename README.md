@@ -17,6 +17,14 @@
 - **Mục tiêu:** Xây dựng hệ thống quản lý lớp học, điểm danh và xử lý đơn xin nghỉ học theo thời gian thực.
 - **Đối tượng sử dụng:** Sinh viên & Giảng viên
 - **Nền tảng:** Android - IOS
+- Danh sách thành viên:
+
+| STT | Họ và Tên             | MSSV    | Vai Trò      |
+| --- | --------------------- | ------- | ------------ |
+| 1   | Võ Giang Ninh         | 2210834 | BE Developer |
+| 2   | Lâm Phúc Thịnh        | 2213276 | BE Developer |
+| 3   | Trịnh Thị Mỹ Lệ       | 2211832 | FE Developer |
+| 4   | Nguyễn Đức Trung Kiên | 2311734 | FE Developer |
 
 ---
 
@@ -109,13 +117,13 @@ Trong môi trường học tập hiện đại, việc quản lý điểm danh v
 
 ## 📌 ROADMAP PHÁT TRIỂN
 
-- [x] Đăng nhập / đăng ký
-- [x] Quản lý lớp học
-- [x] Tạo & duyệt đơn xin nghỉ
-- [x] Xuất báo cáo CSV
-- [ ] Thống kê điểm danh theo biểu đồ
-- [ ] Thông báo đẩy (Push Notification)
-- [ ] Tích hợp LMS
+✅ Đăng nhập / đăng ký  
+✅ Quản lý lớp học  
+✅ Tạo & duyệt đơn xin nghỉ  
+✅ Xuất báo cáo CSV  
+🕓 Thống kê điểm danh theo biểu đồ  
+🕓 Thông báo đẩy (Push Notification)  
+🕓 Tích hợp LMS
 
 ---
 
@@ -123,9 +131,11 @@ Trong môi trường học tập hiện đại, việc quản lý điểm danh v
 
 Nếu bạn có bất kỳ thắc mắc, góp ý hoặc muốn hợp tác:
 
-📧 Email: thinh.lam220304@hcmut.edu.vn
-🌐 Website: https://l01-nhom9.github.io/mobile-app/
-📱 App: Quét QR trên website để tải APK
+- 📧 Email: thinh.lam220304@hcmut.edu.vn
+
+- 🌐 Website: https://l01-nhom9.github.io/mobile-app/
+
+- 📱 App: Quét QR trên website để tải APK
 
 <p align="right"><a href="#readme-top">⬆️ Về đầu trang</a></p>
 
