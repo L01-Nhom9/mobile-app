@@ -72,7 +72,7 @@ Trong môi trường học tập hiện đại, việc quản lý điểm danh v
 
 ## 🚀 CÔNG NGHỆ SỬ DỤNG
 
-- 📱 **Mobile App:** Flutter / React Native
+- 📱 **Mobile App:** React Native
 - 🌐 **Web Landing Page:** HTML, CSS, JavaScript
 - ⚙️ **Backend:** Java Spring Boot
 - 🔐 **Authentication:** JWT
