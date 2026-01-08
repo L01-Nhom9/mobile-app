@@ -100,7 +100,7 @@ export default function RequestFormScreen({ route, navigation, user }) {
                 // Get filename
                 const filename = proofImage.split('/').pop();
                 const match = /\.(\w+)$/.exec(filename);
-                const type = match ? `image/${match[1]}` : `image`;
+                const type = match ? `image/${match[1]}` : `image/jpeg`;
 
                 formData.append('evidence', {
                     uri: proofImage,

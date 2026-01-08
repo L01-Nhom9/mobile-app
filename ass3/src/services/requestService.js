@@ -4,8 +4,11 @@ export const requestService = {
   submitLeaveRequest: async (formData) => {
     try {
       const response = await api.post('/leave-request/submit', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
         transformRequest: (data, headers) => {
-            return data; // formatted form data
+            return data;
         },
       });
       return response.data;
@@ -26,15 +29,19 @@ export const requestService = {
   getRequestEvidence: async (requestId) => {
       try {
           const response = await api.get(`/leave-request/evidence/${requestId}`, {
-              responseType: 'arraybuffer' // Important for images
+              responseType: 'blob' 
           });
-          // Convert to base64
-          const base64 = Buffer.from(response.data, 'binary').toString('base64');
           
-          // Determine mime type if possible, or default to png/jpeg logic
-          // The API might return content-type header
-          const contentType = response.headers['content-type'] || 'image/jpeg';
-          return `data:${contentType};base64,${base64}`;
+          return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => {
+                  resolve(reader.result);
+              };
+              reader.onerror = (error) => {
+                  reject(error);
+              };
+              reader.readAsDataURL(response.data);
+          });
       } catch (error) {
           throw error;
       }
