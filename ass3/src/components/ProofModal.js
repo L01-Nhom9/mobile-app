@@ -1,22 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GradientButton from './Button';
 import { API_URL } from '../config';
+import { requestService } from '../services/requestService';
 
 export default function ProofModal({ visible, onClose, requestId, accessToken, studentName, date, reason, status }) {
     
-    const imageUrl = `${API_URL}/leave-request/evidence/${requestId}`;
-    
-    // Construct source object for Image component
-    const imageSource = {
-        uri: imageUrl,
-        headers: {
-            Authorization: `Bearer ${accessToken}`
+    const [imageUri, setImageUri] = useState(null);
+    const [loadingImage, setLoadingImage] = useState(false);
+    const [isFullScreen, setIsFullScreen] = React.useState(false);
+
+    useEffect(() => {
+        if (visible && requestId) {
+            fetchImage();
+        } else {
+            setImageUri(null);
+        }
+    }, [visible, requestId]);
+
+    const fetchImage = async () => {
+        setLoadingImage(true);
+        try {
+            const base64Img = await requestService.getRequestEvidence(requestId);
+            setImageUri(base64Img);
+        } catch (error) {
+            console.log("Error fetching proof image:", error);
+            setImageUri(null);
+        } finally {
+            setLoadingImage(false);
         }
     };
-
-    const [isFullScreen, setIsFullScreen] = React.useState(false);
 
     const getStatusStyle = (s) => {
         switch (s) {
@@ -66,14 +80,24 @@ export default function ProofModal({ visible, onClose, requestId, accessToken, s
 
                     {/* Image Area */}
                     <View style={styles.imageContainer}>
-                         <TouchableOpacity onPress={() => setIsFullScreen(true)}>
-                             <Image 
-                                source={imageSource} 
-                                style={styles.image} 
-                                resizeMode="contain"
-                                onError={(e) => console.log('Image Load Error', e.nativeEvent.error)}
-                             />
-                         </TouchableOpacity>
+                        {loadingImage ? (
+                            <ActivityIndicator size="large" color="#93C5FD" style={{ marginTop: 80 }} />
+                        ) : (
+                            imageUri ? (
+                                <TouchableOpacity onPress={() => setIsFullScreen(true)}>
+                                    <Image 
+                                        source={{ uri: imageUri }}
+                                        style={styles.image} 
+                                        resizeMode="contain"
+                                        onError={(e) => console.log('Image Load Error', e.nativeEvent.error)}
+                                    />
+                                </TouchableOpacity>
+                            ) : (
+                                <View style={styles.placeholder}>
+                                    <Text style={{color: '#999'}}>Không có ảnh hoặc lỗi tải ảnh</Text>
+                                </View>
+                            )
+                        )}
                     </View>
 
                     {/* Bottom Status Button */}
@@ -97,11 +121,13 @@ export default function ProofModal({ visible, onClose, requestId, accessToken, s
                     <TouchableOpacity style={styles.closeFullScreenButton} onPress={() => setIsFullScreen(false)}>
                          <Ionicons name="close" size={30} color="white" />
                     </TouchableOpacity>
-                    <Image
-                        source={imageSource}
-                        style={styles.fullScreenImage}
-                        resizeMode="contain"
-                    />
+                    {imageUri && (
+                        <Image
+                            source={{ uri: imageUri }}
+                            style={styles.fullScreenImage}
+                            resizeMode="contain"
+                        />
+                    )}
                 </View>
             </Modal>
         </Modal>
