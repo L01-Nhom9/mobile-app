@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,7 +25,11 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -216,4 +222,89 @@ class ReportControllerTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(instructor)))
                 .andExpect(status().isBadRequest());
     }
+
+
+
+
+
+
+
+
+
+
+
+        // ==================== AUTHORIZATION TESTS ====================
+
+        @Test
+        void submitLeaveRequest_Unauthorized_WithoutAuth() throws Exception {
+        MockMultipartFile evidence = new MockMultipartFile(
+                "evidence", "certificate.pdf", "application/pdf", "test".getBytes());
+
+        mockMvc.perform(multipart("/api/leave-request/submit")
+                        .file(evidence)
+                        .param("classroomId", "CLASS001")
+                        .param("absenceDate", "2025-12-31")
+                        .param("reason", "Malade")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void getMyRequests_Unauthorized_WithoutAuth() throws Exception {
+        mockMvc.perform(get("/api/leave-request/my-requests"))
+                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void approveRequest_Unauthorized_WithoutAuth() throws Exception {
+        mockMvc.perform(post("/api/leave-request/1/approve")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(roles = "STUDENT")
+        void getLeaveRequestsByClassroom_ForbiddenForStudent() throws Exception {
+        mockMvc.perform(get("/api/leave-request/classroom/CLASS001"))
+                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(roles = "STUDENT")
+        void getAllMyLeaveRequests_ForbiddenForStudent() throws Exception {
+        mockMvc.perform(get("/api/leave-request/my-all"))
+                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(roles = "STUDENT")
+        void getPendingRequests_ForbiddenForStudent() throws Exception {
+        mockMvc.perform(get("/api/leave-request/CLASS001/pending"))
+                .andExpect(status().isForbidden());
+        }
+
+
+        @Test
+        @WithMockUser(roles = "INSTRUCTOR")
+        void getMyRequests_ForbiddenForInstructor() throws Exception {
+        mockMvc.perform(get("/api/leave-request/my-requests"))
+                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(roles = "INSTRUCTOR")
+        void deleteRequest_ForbiddenForInstructor() throws Exception {
+        mockMvc.perform(delete("/api/leave-request/1")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(roles = "INSTRUCTOR")
+        void getRequestDetail_ForbiddenForInstructor() throws Exception {
+        mockMvc.perform(get("/api/leave-request/1"))
+                .andExpect(status().isForbidden());
+        }
+
+
 }
