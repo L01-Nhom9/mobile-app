@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-    info = @Info(title = "Jira Clone API", version = "v1"),
+    info = @Info(title = "ClassTrack API", version = "v1"),
     servers = {
         @Server(url = "/", description = "Default Server URL"),
         @Server(url = "/api/java", description = "Gateway Default Server URL")
