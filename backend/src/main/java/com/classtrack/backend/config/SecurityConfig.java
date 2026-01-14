@@ -32,13 +32,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> {})
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                // PUBLIC
+                .requestMatchers(
+                    "/",
+                    "/health",
+                    "/error",
+                    "/api/auth/**"
+                ).permitAll()
+
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/instructor/**").hasRole("INSTRUCTOR")
-                .requestMatchers("/api/student/**").hasRole("STUDENT")
+
+                // ROLE
+                .requestMatchers("/api/instructor/**").hasAuthority("ROLE_INSTRUCTOR")
+                .requestMatchers("/api/student/**").hasAuthority("ROLE_STUDENT")
+
+                // AUTHENTICATED
                 .requestMatchers("/api/leave-request/evidence/**").authenticated()
+
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -49,6 +61,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
 
     @Bean
